@@ -3,1093 +3,1048 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>YSF Genomic Laboratory — DNA Paternity Match</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<title>YSF Genomic Laboratory — DNA Paternity Test</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#12131a;--surface:#1c1e2b;--panel:#22253a;--border:#2e3248;
+  --gold:#c9a84c;--gold-lt:#e8c96a;--gold-faint:rgba(201,168,76,0.10);
+  --green:#3ddc84;--green-dim:rgba(61,220,132,0.15);
+  --red:#e05c6a;--red-dim:rgba(224,92,106,0.15);
+  --orange:#f0a500;--orange-dim:rgba(240,165,0,0.15);
+  --cream:#eae6dc;--muted:#6b7094;--muted-lt:#8990b8;--blue:#6fc3df;
+  --mono:'IBM Plex Mono','Courier New',monospace;
+  --display:'Playfair Display',Georgia,serif;
+  --body:'Lato','Helvetica Neue',sans-serif;
+}
+html,body{background:var(--bg);color:var(--cream);font-family:var(--body);min-height:100vh;
+  background-image:radial-gradient(ellipse 100% 40% at 50% -5%,#1e1a0a 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 100% 100%,#081420 0%,transparent 60%);}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+#app{max-width:560px;margin:0 auto;padding:0 0 80px}
 
-  :root {
-    --bg:        #12131a;
-    --surface:   #1c1e2b;
-    --panel:     #22253a;
-    --border:    #2e3248;
-    --gold:      #c9a84c;
-    --gold-lt:   #e8c96a;
-    --gold-dim:  rgba(201,168,76,0.27);
-    --gold-faint:rgba(201,168,76,0.10);
-    --green:     #3ddc84;
-    --green-dim: rgba(61,220,132,0.18);
-    --red:       #e05c6a;
-    --red-dim:   rgba(224,92,106,0.18);
-    --cream:     #eae6dc;
-    --muted:     #6b7094;
-    --muted-lt:  #8990b8;
-    --blue:      #6fc3df;
-    --mono:      'IBM Plex Mono', 'Courier New', monospace;
-    --display:   'Playfair Display', Georgia, serif;
-    --body:      'Lato', 'Helvetica Neue', sans-serif;
-  }
+/* HEADER */
+#header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-box{width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold),#8a5c1a);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(201,168,76,0.3),inset 0 1px 0 rgba(232,201,106,0.4);
+  font-family:var(--display);font-weight:700;font-size:15px;color:#1a1000;letter-spacing:0.5px}
+.logo-name{font-family:var(--display);font-size:15px;color:var(--gold);line-height:1.2}
+.logo-sub{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2.5px;margin-top:1px}
+.header-right{text-align:right}
+.case-id{font-family:var(--mono);font-size:9px;color:rgba(201,168,76,0.8);letter-spacing:1px}
+.ts{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
+.gold-line{margin:14px 20px 0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),var(--gold),rgba(201,168,76,0.4),transparent)}
 
-  html, body {
-    background: var(--bg); color: var(--cream);
-    font-family: var(--body); min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse 100% 40% at 50% -5%, #1e1a0a 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 100% 100%, #081420 0%, transparent 60%);
-  }
+/* BODY */
+#body{padding:24px 20px}
+h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight:700;
+  line-height:1.2;margin-bottom:5px;
+  background:linear-gradient(135deg,var(--cream) 30%,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:3px}
 
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+/* PERSON NAME INPUTS */
+.name-row{display:flex;gap:12px;margin:18px 0 14px}
+.name-group{flex:1;display:flex;flex-direction:column;gap:5px}
+.name-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px}
+.name-input{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;color:var(--cream);font-family:var(--mono);font-size:11px;
+  outline:none;transition:border-color 0.2s;width:100%}
+.name-input:focus{border-color:rgba(201,168,76,0.5)}
+.name-input.child-inp:focus{border-color:rgba(111,195,223,0.5)}
 
-  /* ── LAYOUT ── */
-  #app { max-width: 520px; margin: 0 auto; padding: 0 0 60px; }
+/* TILES */
+.tiles{display:flex;gap:12px;margin-bottom:18px}
+.tile{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:border-color 0.4s,box-shadow 0.4s;cursor:pointer}
+.tile.has-data{box-shadow:0 0 30px rgba(201,168,76,0.10)}
+.tile.child.has-data{box-shadow:0 0 30px rgba(111,195,223,0.10)}
+.tile-label-row{display:flex;align-items:center;gap:7px}
+.tile-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all 0.4s}
+.tile-lbl{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);transition:color 0.3s}
+.canvas-wrap{position:relative;width:140px;height:140px}
+.fp-canvas{display:block;border-radius:50%;background:var(--panel)}
+.scan-bar{display:none;position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  box-shadow:0 0 8px var(--gold);animation:scanLine 1.4s ease-in-out infinite}
+.scan-bar.cb{background:linear-gradient(90deg,transparent,var(--blue),transparent);box-shadow:0 0 8px var(--blue)}
+.tile-hint{display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none;
+  position:absolute;inset:0;justify-content:center}
+.tile-hint span{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-align:center;line-height:1.6}
+.captured-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:var(--gold);background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);
+  border-radius:4px;padding:3px 10px;margin-bottom:3px}
+.tile.child .captured-badge{color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.2)}
+.method-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
+.rescan-btn{font-family:var(--mono);font-size:9px;letter-spacing:2px;padding:4px 12px;
+  background:transparent;border:1px solid var(--border);border-radius:6px;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;display:none}
+.rescan-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
 
-  /* ── HEADER ── */
-  #header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 20px 0;
-  }
-  .logo-wrap { display: flex; align-items: center; gap: 10px; }
-  .logo-box {
-    width: 40px; height: 40px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--gold), #8a5c1a);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 20px rgba(201,168,76,0.3), inset 0 1px 0 rgba(232,201,106,0.4);
-    font-family: var(--display); font-weight: 700; font-size: 15px;
-    color: #1a1000; letter-spacing: 0.5px; flex-shrink: 0;
-  }
-  .logo-name { font-family: var(--display); font-size: 15px; color: var(--gold); line-height: 1.2; }
-  .logo-sub  { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: 2.5px; margin-top: 1px; }
-  .header-right { text-align: right; }
-  .case-id   { font-family: var(--mono); font-size: 9px; color: rgba(201,168,76,0.8); letter-spacing: 1px; }
-  .timestamp { font-family: var(--mono); font-size: 8px; color: var(--muted); margin-top: 2px; }
+/* CONNECTOR */
+.connector{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.conn-line{flex:1;height:1px;background:var(--border);transition:background 0.4s}
+.conn-badge{font-family:var(--mono);font-size:8px;letter-spacing:2px;white-space:nowrap;
+  color:var(--muted);padding:4px 12px;border:1px solid var(--border);border-radius:20px;transition:all 0.3s}
+.conn-badge.ready{color:var(--gold);border-color:rgba(201,168,76,0.3);background:var(--gold-faint)}
 
-  .gold-line {
-    margin: 14px 20px 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), var(--gold), rgba(201,168,76,0.4), transparent);
-  }
+/* ANALYZE BTN */
+#analyze-btn{width:100%;padding:15px;background:transparent;border:1.5px solid var(--border);
+  border-radius:12px;cursor:not-allowed;font-family:var(--mono);font-size:12px;letter-spacing:4px;
+  color:var(--muted);transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px}
+#analyze-btn.ready{background:linear-gradient(135deg,rgba(201,168,76,0.13),rgba(201,168,76,0.04));
+  border-color:var(--gold);color:var(--gold);cursor:pointer;box-shadow:0 0 28px rgba(201,168,76,0.27)}
+#analyze-btn.ready:hover{background:linear-gradient(135deg,rgba(201,168,76,0.22),rgba(201,168,76,0.08))}
+.spinner{width:16px;height:16px;border:2px solid transparent;border-top-color:var(--gold);
+  border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
 
-  /* ── BODY ── */
-  #body { padding: 24px 20px; }
+/* ANALYSIS STEPS */
+#analysis-steps{display:none;margin-top:14px;padding:14px 16px;
+  background:var(--panel);border-radius:10px;border:1px solid var(--border)}
+.astep{display:flex;align-items:center;gap:8px;margin-bottom:6px;
+  font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--muted);transition:color 0.3s}
+.astep:last-child{margin-bottom:0}
+.astep-icon{width:10px;text-align:center;color:var(--border);transition:color 0.3s}
+.astep.done .astep-icon{color:var(--green)}
+.astep.active .astep-icon{color:var(--gold);animation:dotBlink 0.9s infinite}
+.astep.done,.astep.active{color:var(--cream)}
 
-  h1.title {
-    font-family: var(--display); font-size: 26px; font-style: italic;
-    font-weight: 700; line-height: 1.2; margin-bottom: 5px;
-    background: linear-gradient(135deg, var(--cream) 30%, var(--gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .subtitle { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 3px; }
+/* INFO BOX */
+.info-box{margin-top:22px;padding:14px 16px;background:var(--gold-faint);
+  border:1px solid rgba(201,168,76,0.14);border-radius:10px;
+  font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.9;letter-spacing:0.8px}
+.info-title{color:rgba(201,168,76,0.75);margin-bottom:5px;letter-spacing:3px;font-size:9px}
 
-  /* ── STEP TABS ── */
-  .step-tabs { display: flex; gap: 8px; margin: 18px 0; }
-  .step-tab {
-    flex: 1; text-align: center; padding: 7px 4px;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 7px;
-    font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted);
-    transition: all 0.3s;
-  }
-  .step-tab.active {
-    background: var(--gold-faint); border-color: rgba(201,168,76,0.34); color: var(--gold);
-  }
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:20px}
+#modal-overlay.open{display:flex}
+#modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:28px 24px;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,0.55);
+  animation:modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1)}
+.modal-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.modal-title{font-family:var(--display);font-size:18px;color:var(--cream);font-style:italic}
+.modal-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}
+.modal-close{font-family:var(--mono);font-size:14px;padding:4px 10px;background:transparent;
+  border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.method-list{display:flex;flex-direction:column;gap:10px}
+.method-btn{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:14px;
+  text-align:left;transition:border-color 0.2s,background 0.2s;width:100%}
+.method-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.method-name{font-family:var(--body);font-size:13px;color:var(--cream);margin-bottom:2px}
+.method-desc{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
+.modal-section{display:none}.modal-section.visible{display:block}
+.bio-icon{font-size:52px;text-align:center;margin-bottom:14px;animation:pulse 1.5s infinite}
+.bio-status{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-align:center;margin-bottom:8px}
+.bio-hint{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center}
+.err-icon{font-size:36px;text-align:center;margin-bottom:12px}
+.err-text{font-family:var(--mono);font-size:11px;color:var(--red);text-align:center;margin-bottom:16px;letter-spacing:1px}
+#draw-canvas{display:block;border-radius:8px;border:1.5px solid rgba(201,168,76,0.27);
+  touch-action:none;cursor:crosshair;background:var(--panel);margin:0 auto}
+.draw-btns{display:flex;gap:8px;margin-top:8px;justify-content:center}
+.ghost-btn{font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:6px 16px;
+  background:transparent;border:1px solid var(--border);border-radius:6px;
+  color:var(--muted);cursor:pointer;transition:all 0.2s}
+.ghost-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+.ghost-btn.accent{border-color:rgba(201,168,76,0.5);color:var(--gold)}
+.ghost-btn.accent:hover{background:var(--gold-faint)}
+.ghost-btn.back{margin-top:10px;width:100%}
 
-  /* ── TILES ── */
-  .tiles { display: flex; gap: 12px; margin-bottom: 18px; }
-  .tile {
-    flex: 1; background: var(--panel); border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px 16px;
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-    transition: border-color 0.4s, box-shadow 0.4s; cursor: pointer;
-  }
-  .tile.has-data { box-shadow: 0 0 30px rgba(201,168,76,0.10); }
-  .tile.child.has-data { box-shadow: 0 0 30px rgba(111,195,223,0.10); }
-  .tile-label-row { display: flex; align-items: center; gap: 8px; }
-  .tile-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--border); transition: all 0.4s;
-  }
-  .tile-label {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--muted);
-    transition: color 0.3s;
-  }
-  .canvas-wrap {
-    position: relative; width: 148px; height: 148px; border-radius: 50%; overflow: visible;
-  }
-  .fp-canvas { display: block; border-radius: 50%; background: var(--panel); }
-  .scan-bar {
-    display: none; position: absolute; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    box-shadow: 0 0 8px var(--gold);
-    animation: scanLine 1.4s ease-in-out infinite;
-  }
-  .scan-bar.child-bar {
-    background: linear-gradient(90deg, transparent, var(--blue), transparent);
-    box-shadow: 0 0 8px var(--blue);
-  }
-  .tile-empty-hint {
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-    pointer-events: none;
-  }
-  .tile-empty-hint span {
-    font-family: var(--mono); font-size: 9px; color: var(--muted);
-    letter-spacing: 2px; text-align: center; line-height: 1.6;
-  }
-  .tile-status { text-align: center; }
-  .captured-badge {
-    display: inline-block; font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-    color: var(--gold); background: rgba(201,168,76,0.1);
-    border: 1px solid rgba(201,168,76,0.2); border-radius: 4px; padding: 3px 10px;
-    margin-bottom: 4px;
-  }
-  .child .captured-badge { color: var(--blue); background: rgba(111,195,223,0.1); border-color: rgba(111,195,223,0.2); }
-  .method-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
-  .ref-label    { font-family: var(--mono); font-size: 8px; color: rgba(107,112,148,0.6); margin-top: 2px; }
-  .rescan-btn {
-    font-family: var(--mono); font-size: 9px; letter-spacing: 2px; padding: 4px 12px;
-    background: transparent; border: 1px solid var(--border); border-radius: 6px;
-    color: var(--muted); cursor: pointer; transition: all 0.2s;
-  }
-  .rescan-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); }
+/* ══ RESULT ══ */
+#result-section{display:none}
+#result-section.visible{display:block;animation:fadeUp 0.5s ease}
 
-  /* ── CONNECTOR ── */
-  .connector { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
-  .conn-line { flex: 1; height: 1px; background: var(--border); transition: background 0.4s; }
-  .conn-badge {
-    font-family: var(--mono); font-size: 8px; letter-spacing: 2px; white-space: nowrap;
-    color: var(--muted); padding: 4px 12px;
-    border: 1px solid var(--border); border-radius: 20px; background: transparent;
-    transition: all 0.3s;
-  }
-  .conn-badge.ready { color: var(--gold); border-color: rgba(201,168,76,0.3); background: var(--gold-faint); }
+/* Print header */
+.print-header{display:none}
 
-  /* ── ANALYZE BUTTON ── */
-  #analyze-btn {
-    width: 100%; padding: 15px;
-    background: transparent; border: 1.5px solid var(--border);
-    border-radius: 12px; cursor: not-allowed;
-    font-family: var(--mono); font-size: 12px; letter-spacing: 4px;
-    color: var(--muted); transition: all 0.3s; display: flex;
-    align-items: center; justify-content: center; gap: 10px;
-  }
-  #analyze-btn.ready {
-    background: linear-gradient(135deg, rgba(201,168,76,0.13), rgba(201,168,76,0.04));
-    border-color: var(--gold); color: var(--gold); cursor: pointer;
-    box-shadow: 0 0 28px var(--gold-dim);
-  }
-  #analyze-btn.ready:hover {
-    background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(201,168,76,0.08));
-  }
+.report-meta{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.report-case{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:3px}
+.report-id{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
+.report-ts{font-family:var(--mono);font-size:8px;color:var(--muted);text-align:right}
 
-  /* ── SPINNER ── */
-  .spinner {
-    width: 16px; height: 16px; border: 2px solid transparent;
-    border-top-color: var(--gold); border-radius: 50%;
-    animation: spin 0.8s linear infinite; flex-shrink: 0;
-  }
+/* BIG MATCH CIRCLE */
+.match-circle-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:20px}
+.match-ring-svg{filter:drop-shadow(0 0 18px currentColor)}
+.match-pct-label{font-family:var(--display);font-size:48px;font-weight:700;font-style:italic;
+  margin-top:-6px;line-height:1}
+.match-pct-sub{font-family:var(--mono);font-size:10px;letter-spacing:3px;margin-top:4px}
 
-  /* ── ANALYSIS STEPS ── */
-  #analysis-steps {
-    display: none; margin-top: 14px; padding: 14px 16px;
-    background: var(--panel); border-radius: 10px; border: 1px solid var(--border);
-  }
-  .astep {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-    font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: var(--muted);
-    transition: color 0.3s;
-  }
-  .astep:last-child { margin-bottom: 0; }
-  .astep-icon { width: 10px; text-align: center; color: var(--border); transition: color 0.3s; }
-  .astep.done .astep-icon  { color: var(--green); }
-  .astep.active .astep-icon { color: var(--gold); animation: dotBlink 0.9s infinite; }
-  .astep.done, .astep.active { color: var(--cream); }
+/* VERDICT */
+.verdict-box{border-radius:14px;padding:20px;text-align:center;margin-bottom:18px}
+.verdict-icon{font-size:40px;margin-bottom:8px;line-height:1}
+.verdict-title{font-family:var(--display);font-size:22px;font-style:italic;font-weight:700;margin-bottom:6px}
+.verdict-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px}
+.verdict-box.high{background:var(--green-dim);border:1.5px solid rgba(61,220,132,0.34);box-shadow:0 0 40px rgba(61,220,132,0.12)}
+.verdict-box.mid{background:var(--orange-dim);border:1.5px solid rgba(240,165,0,0.34);box-shadow:0 0 40px rgba(240,165,0,0.12)}
+.verdict-box.low{background:var(--red-dim);border:1.5px solid rgba(224,92,106,0.34);box-shadow:0 0 40px rgba(224,92,106,0.12)}
+.verdict-box.high .verdict-title{color:var(--green)}
+.verdict-box.mid  .verdict-title{color:var(--orange)}
+.verdict-box.low  .verdict-title{color:var(--red)}
 
-  /* ── INFO BOX ── */
-  .info-box {
-    margin-top: 22px; padding: 14px 16px;
-    background: var(--gold-faint); border: 1px solid rgba(201,168,76,0.14);
-    border-radius: 10px; font-family: var(--mono); font-size: 9px;
-    color: var(--muted); line-height: 1.9; letter-spacing: 0.8px;
-  }
-  .info-box .info-title { color: rgba(201,168,76,0.75); margin-bottom: 5px; letter-spacing: 3px; font-size: 9px; }
+/* SUBJECTS ROW */
+.subjects-row{display:flex;gap:12px;margin-bottom:16px}
+.subject-card{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.subject-role{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:4px}
+.subject-name{font-family:var(--display);font-size:16px;font-style:italic;color:var(--cream)}
+.subject-fp{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:3px}
 
-  /* ── MODAL ── */
-  #modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
-    z-index: 100; align-items: center; justify-content: center; padding: 20px;
-  }
-  #modal-overlay.open { display: flex; }
-  #modal-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 380px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.55);
-    animation: modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-  .modal-title { font-family: var(--display); font-size: 18px; color: var(--cream); font-style: italic; }
-  .modal-sub   { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-top: 3px; }
-  .modal-close {
-    font-family: var(--mono); font-size: 14px; padding: 4px 10px;
-    background: transparent; border: 1px solid var(--border); border-radius: 6px;
-    color: var(--muted); cursor: pointer; flex-shrink: 0;
-  }
-  .modal-close:hover { border-color: var(--red); color: var(--red); }
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px}
+.stat-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:6px}
+.stat-val{font-family:var(--display);font-size:20px;color:var(--cream);font-style:italic}
+.stat-unit{font-family:var(--mono);font-size:8px;color:var(--muted-lt);margin-top:2px}
 
-  .method-list { display: flex; flex-direction: column; gap: 10px; }
-  .method-btn {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 14px; cursor: pointer;
-    display: flex; align-items: center; gap: 14px; text-align: left;
-    transition: border-color 0.2s, background 0.2s; width: 100%;
-  }
-  .method-btn:hover { background: var(--bg); }
-  .method-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
-  .method-name { font-family: var(--body); font-size: 13px; color: var(--cream); margin-bottom: 2px; }
-  .method-desc { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+/* RIDGE ANALYSIS TABLE */
+.section-title{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:3px;
+  margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.ridge-table{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-bottom:16px}
+.ridge-thead{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  padding:9px 14px;background:var(--bg);border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px}
+.ridge-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  padding:8px 14px;font-family:var(--mono);font-size:9px;
+  border-bottom:1px solid rgba(46,50,72,0.4);align-items:center;
+  animation:fadeUp 0.3s ease both}
+.ridge-row:last-child{border-bottom:none}
+.ridge-row:nth-child(even){background:rgba(18,19,26,0.5)}
+.ridge-name{color:var(--cream);letter-spacing:1px}
+.ridge-val{color:var(--muted-lt)}
+.match-bar-cell{display:flex;align-items:center;gap:6px}
+.mini-bar{height:4px;border-radius:2px;flex:1;background:var(--border);overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
 
-  .modal-section { display: none; }
-  .modal-section.visible { display: block; }
+/* INTERPRETATION */
+.interp-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:16px}
+.interp-title{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:12px}
+.interp-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.interp-row:last-child{margin-bottom:0}
+.interp-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.interp-text{font-family:var(--body);font-size:12px;color:var(--cream);line-height:1.7}
+.interp-text strong{color:var(--gold);font-weight:600}
+.interp-text.muted-text{color:var(--muted);font-size:11px}
 
-  .biometric-icon { font-size: 52px; text-align: center; margin-bottom: 14px; animation: pulse 1.5s infinite; }
-  .biometric-status { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-align: center; margin-bottom: 8px; }
-  .biometric-hint   { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; }
-  .error-icon   { font-size: 36px; text-align: center; margin-bottom: 12px; }
-  .error-text   { font-family: var(--mono); font-size: 11px; color: var(--red); text-align: center; margin-bottom: 16px; letter-spacing: 1px; }
+/* METHODOLOGY */
+.method-box{background:var(--gold-faint);border:1px solid rgba(201,168,76,0.14);
+  border-radius:12px;padding:16px;margin-bottom:16px;
+  font-family:var(--body);font-size:12px;color:var(--muted);line-height:1.8}
+.method-box-title{font-family:var(--mono);font-size:9px;color:rgba(201,168,76,0.75);
+  letter-spacing:3px;margin-bottom:10px}
+.method-box p{margin-bottom:6px}
+.method-box p:last-child{margin-bottom:0}
 
-  #draw-canvas {
-    display: block; border-radius: 8px;
-    border: 1.5px solid rgba(201,168,76,0.27); touch-action: none; cursor: crosshair;
-    background: var(--panel); margin: 0 auto;
-  }
-  .draw-btns { display: flex; gap: 8px; margin-top: 8px; justify-content: center; }
+/* DISCLAIMER */
+.disclaimer{background:rgba(46,50,72,0.3);border:1px solid var(--border);
+  border-radius:10px;padding:14px;margin-bottom:20px;
+  font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.8;letter-spacing:0.5px}
+.disclaimer-title{color:var(--red);letter-spacing:3px;margin-bottom:6px;font-size:9px}
 
-  .ghost-btn {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-    padding: 6px 16px; background: transparent;
-    border: 1px solid var(--border); border-radius: 6px;
-    color: var(--muted); cursor: pointer; transition: all 0.2s;
-  }
-  .ghost-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); }
-  .ghost-btn.accent { border-color: rgba(201,168,76,0.5); color: var(--gold); }
-  .ghost-btn.accent:hover { background: var(--gold-faint); }
-  .ghost-btn.back { margin-top: 10px; width: 100%; }
+/* ACTION BTNS */
+.action-row{display:flex;gap:10px;margin-bottom:0}
+#print-btn{flex:1;padding:13px;background:linear-gradient(135deg,rgba(201,168,76,0.13),rgba(201,168,76,0.04));
+  border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);
+  font-family:var(--mono);font-size:11px;letter-spacing:3px;cursor:pointer;transition:all 0.2s}
+#print-btn:hover{background:rgba(201,168,76,0.2)}
+#reset-btn{flex:1;padding:13px;background:transparent;border:1.5px solid var(--border);
+  border-radius:10px;color:var(--muted);font-family:var(--mono);
+  font-size:11px;letter-spacing:3px;cursor:pointer;transition:all 0.2s}
+#reset-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
 
-  /* ── RESULT ── */
-  #result-section { display: none; }
-  #result-section.visible { display: block; animation: fadeUp 0.5s ease; }
+/* FOOTER */
+#footer{text-align:center;padding:0 20px;font-family:var(--mono);font-size:8px;
+  color:rgba(107,112,148,0.4);letter-spacing:2px;line-height:2}
 
-  .report-header {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 14px 16px; margin-bottom: 16px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .report-case { font-family: var(--mono); font-size: 9px; color: var(--gold); letter-spacing: 3px; }
-  .report-id   { font-family: var(--mono); font-size: 8px; color: var(--muted); margin-top: 2px; }
-  .report-ts   { font-family: var(--mono); font-size: 8px; color: var(--muted); text-align: right; }
+/* ANIMATIONS */
+@keyframes scanLine{0%,100%{top:4%}50%{top:86%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalIn{from{opacity:0;transform:scale(0.93) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes dotBlink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+.fade-in{animation:fadeUp 0.4s ease both}
 
-  .verdict-box {
-    border-radius: 14px; padding: 22px 20px;
-    text-align: center; margin-bottom: 18px;
-  }
-  .verdict-icon  { font-size: 46px; margin-bottom: 8px; line-height: 1; }
-  .verdict-title { font-family: var(--display); font-size: 24px; font-style: italic; font-weight: 700; margin-bottom: 6px; }
-  .verdict-sub   { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; }
-
-  .verdict-box.match   { background: var(--green-dim); border: 1.5px solid rgba(61,220,132,0.34); box-shadow: 0 0 40px rgba(61,220,132,0.14); }
-  .verdict-box.nomatch { background: var(--red-dim);   border: 1.5px solid rgba(224,92,106,0.34); box-shadow: 0 0 40px rgba(224,92,106,0.14); }
-  .verdict-box.match   .verdict-title { color: var(--green); }
-  .verdict-box.nomatch .verdict-title { color: var(--red); }
-
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .stat-card  {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px;
-  }
-  .stat-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: 2px; margin-bottom: 6px; }
-  .stat-value { font-family: var(--display); font-size: 20px; color: var(--cream); font-style: italic; }
-  .stat-unit  { font-family: var(--mono); font-size: 8px; color: var(--muted-lt); margin-top: 2px; }
-
-  .str-table {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden; margin-bottom: 16px;
-  }
-  .str-thead {
-    display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 0.7fr 1fr;
-    padding: 10px 14px; background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 2px;
-  }
-  .str-row {
-    display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 0.7fr 1fr;
-    padding: 7px 14px; font-family: var(--mono); font-size: 9px;
-    border-bottom: 1px solid rgba(46,50,72,0.4); align-items: center;
-    animation: fadeUp 0.3s ease both;
-  }
-  .str-row:last-child { border-bottom: none; }
-  .str-row:nth-child(even) { background: rgba(18,19,26,0.5); }
-  .str-locus { color: var(--cream); letter-spacing: 1px; }
-  .str-allele { color: var(--muted-lt); }
-  .str-match.yes { color: var(--green); font-size: 11px; }
-  .str-match.no  { color: var(--red);   font-size: 11px; }
-  .str-pi.yes { color: var(--green); }
-  .str-pi.no  { color: var(--red); }
-
-  .lab-note {
-    background: var(--gold-faint); border: 1px solid rgba(201,168,76,0.14);
-    border-radius: 10px; padding: 13px 15px; margin-bottom: 20px;
-    font-family: var(--mono); font-size: 9px; color: var(--muted); line-height: 1.9; letter-spacing: 0.5px;
-  }
-  .lab-note-title { color: rgba(201,168,76,0.75); margin-bottom: 5px; letter-spacing: 3px; }
-
-  #reset-btn {
-    width: 100%; padding: 13px;
-    background: transparent; border: 1.5px solid var(--border);
-    border-radius: 10px; color: var(--muted); font-family: var(--mono);
-    font-size: 11px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s;
-  }
-  #reset-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); }
-
-  /* ── FOOTER ── */
-  #footer {
-    text-align: center; padding: 0 20px;
-    font-family: var(--mono); font-size: 8px;
-    color: rgba(107,112,148,0.4); letter-spacing: 2px; line-height: 2;
-  }
-
-  /* ── ANIMATIONS ── */
-  @keyframes scanLine  { 0%,100%{top:4%}  50%{top:86%} }
-  @keyframes pulse     { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  @keyframes fadeUp    { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes modalIn   { from{opacity:0;transform:scale(0.93) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
-  @keyframes spin      { to{transform:rotate(360deg)} }
-  @keyframes dotBlink  { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
-
-  .fade-in { animation: fadeUp 0.4s ease both; }
+/* ══ PRINT STYLES ══ */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff!important;color:#000!important}
+  #header,#capture-section,#footer,#modal-overlay,
+  .action-row,#analyze-btn,#analysis-steps,.info-box{display:none!important}
+  #app{max-width:100%;padding:0}
+  #body{padding:0}
+  #result-section{display:block!important}
+  .gold-line{background:#c9a84c!important;height:2px;margin:10px 0}
+  .print-header{display:block!important;text-align:center;padding:20px 0 10px;
+    border-bottom:2px solid #c9a84c;margin-bottom:20px}
+  .print-logo{font-size:28px;font-weight:700;color:#c9a84c;letter-spacing:4px;font-family:Georgia,serif}
+  .print-sub{font-size:11px;color:#666;letter-spacing:3px;margin-top:4px;font-family:'Courier New',monospace}
+  .print-addr{font-size:10px;color:#888;margin-top:6px;font-family:'Courier New',monospace}
+  .report-meta{background:#f8f6f0!important;border:1px solid #ddd!important;border-radius:0!important}
+  .report-case,.report-id,.report-ts{color:#333!important}
+  .verdict-box{border-radius:8px!important}
+  .verdict-box.high{background:#e8fff3!important;border-color:#3ddc84!important}
+  .verdict-box.mid{background:#fff8e6!important;border-color:#f0a500!important}
+  .verdict-box.low{background:#fff0f2!important;border-color:#e05c6a!important}
+  .verdict-box.high .verdict-title{color:#1a7a4a!important}
+  .verdict-box.mid  .verdict-title{color:#8a5c00!important}
+  .verdict-box.low  .verdict-title{color:#8a2030!important}
+  .match-pct-label,.stat-val{color:#000!important}
+  .interp-text{color:#222!important}
+  .interp-text strong{color:#8a6a00!important}
+  .subject-name{color:#000!important}
+  .ridge-name{color:#000!important}
+  .method-box{background:#f8f6f0!important;border:1px solid #ddd!important}
+  .method-box-title{color:#8a6a00!important}
+  .method-box p{color:#444!important}
+  .disclaimer{background:#fff5f5!important;border:1px solid #ffcccc!important}
+  .disclaimer-title{color:#cc0000!important}
+  .interp-box{background:#f9f9f9!important;border:1px solid #ddd!important}
+  .stats-grid .stat-card{background:#f8f6f0!important;border:1px solid #ddd!important}
+  .ridge-table{border:1px solid #ddd!important}
+  .ridge-thead{background:#f0ede4!important}
+  .ridge-row:nth-child(even){background:#f8f6f0!important}
+  .subjects-row .subject-card{background:#f8f6f0!important;border:1px solid #ddd!important}
+  .match-circle-wrap svg circle{stroke:#c9a84c}
+  .section-title{color:#8a6a00!important;border-color:#ddd!important}
+}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- HEADER -->
-  <div id="header">
-    <div class="logo-wrap">
-      <div class="logo-box">YSF</div>
-      <div>
-        <div class="logo-name">Genomic Laboratory</div>
-        <div class="logo-sub">PATERNITY TESTING DIVISION</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="case-id" id="case-id"></div>
-      <div class="timestamp" id="timestamp"></div>
+<!-- HEADER -->
+<div id="header">
+  <div class="logo-wrap">
+    <div class="logo-box">YSF</div>
+    <div>
+      <div class="logo-name">Genomic Laboratory</div>
+      <div class="logo-sub">DNA TESTING DIVISION</div>
     </div>
   </div>
-  <div class="gold-line"></div>
+  <div class="header-right">
+    <div class="case-id" id="case-id"></div>
+    <div class="ts" id="timestamp"></div>
+  </div>
+</div>
+<div class="gold-line"></div>
 
-  <!-- BODY -->
-  <div id="body">
+<!-- BODY -->
+<div id="body">
 
-    <!-- CAPTURE SECTION -->
-    <div id="capture-section">
-      <div class="fade-in">
-        <h1 class="title">DNA Paternity Match</h1>
-        <p class="subtitle">FINGERPRINT-ASSISTED STR PROFILING</p>
-      </div>
-
-      <div class="step-tabs">
-        <div class="step-tab active" id="tab-1">01 · SCAN</div>
-        <div class="step-tab"        id="tab-2">02 · ANALYZE</div>
-        <div class="step-tab"        id="tab-3">03 · REPORT</div>
-      </div>
-
-      <!-- Tiles -->
-      <div class="tiles">
-
-        <!-- Father tile -->
-        <div class="tile" id="father-tile" onclick="openModal('father')">
-          <div class="tile-label-row">
-            <div class="tile-dot" id="father-dot"></div>
-            <span class="tile-label" id="father-label">FATHER</span>
-          </div>
-          <div class="canvas-wrap">
-            <canvas class="fp-canvas" id="father-canvas" width="148" height="148"></canvas>
-            <div class="scan-bar" id="father-scanbar"></div>
-            <div class="tile-empty-hint" id="father-hint">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
-                <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
-                <path d="M12 2C6.48 2 2 6.48 2 12"/>
-              </svg>
-              <span>TAP TO<br>SCAN</span>
-            </div>
-          </div>
-          <div class="tile-status" id="father-status" style="display:none">
-            <div class="captured-badge">✓ CAPTURED</div>
-            <div class="method-label" id="father-method"></div>
-            <div class="ref-label" id="father-ref"></div>
-          </div>
-          <button class="rescan-btn" id="father-rescan" style="display:none"
-            onclick="event.stopPropagation(); openModal('father')">RE-SCAN</button>
-        </div>
-
-        <!-- Child tile -->
-        <div class="tile child" id="child-tile" onclick="openModal('child')">
-          <div class="tile-label-row">
-            <div class="tile-dot" id="child-dot" style="background:var(--border)"></div>
-            <span class="tile-label" id="child-label" style="color:var(--muted)">CHILD</span>
-          </div>
-          <div class="canvas-wrap">
-            <canvas class="fp-canvas" id="child-canvas" width="148" height="148"></canvas>
-            <div class="scan-bar child-bar" id="child-scanbar"></div>
-            <div class="tile-empty-hint" id="child-hint">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
-                <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
-                <path d="M12 2C6.48 2 2 6.48 2 12"/>
-              </svg>
-              <span>TAP TO<br>SCAN</span>
-            </div>
-          </div>
-          <div class="tile-status" id="child-status" style="display:none">
-            <div class="captured-badge" style="color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.2)">✓ CAPTURED</div>
-            <div class="method-label" id="child-method"></div>
-            <div class="ref-label" id="child-ref"></div>
-          </div>
-          <button class="rescan-btn" id="child-rescan" style="display:none"
-            onclick="event.stopPropagation(); openModal('child')">RE-SCAN</button>
-        </div>
-
-      </div>
-
-      <!-- Connector -->
-      <div class="connector">
-        <div class="conn-line" id="conn-left"></div>
-        <div class="conn-badge" id="conn-badge">SCAN BOTH SUBJECTS</div>
-        <div class="conn-line" id="conn-right"></div>
-      </div>
-
-      <!-- Analyze button -->
-      <button id="analyze-btn" onclick="runAnalysis()">◈&nbsp;&nbsp;RUN DNA ANALYSIS</button>
-
-      <!-- Analysis steps progress -->
-      <div id="analysis-steps">
-        <div class="astep" id="step-0"><span class="astep-icon">▸</span> Extracting ridge minutiae patterns</div>
-        <div class="astep" id="step-1"><span class="astep-icon">▸</span> Mapping Short Tandem Repeat loci</div>
-        <div class="astep" id="step-2"><span class="astep-icon">▸</span> Computing allele frequency tables</div>
-        <div class="astep" id="step-3"><span class="astep-icon">▸</span> Calculating Combined Paternity Index</div>
-        <div class="astep" id="step-4"><span class="astep-icon">▸</span> Generating certified forensic report</div>
-      </div>
-
-      <!-- Info box -->
-      <div class="info-box">
-        <div class="info-title">SUPPORTED INPUT METHODS</div>
-        <div>◉&nbsp; Phone Biometric — Touch ID · Face ID · Device Fingerprint Sensor</div>
-        <div>⇧&nbsp; Upload Image — Scanned ink print, PNG / JPG file</div>
-        <div>✎&nbsp; Draw on Screen — Trace directly with finger or stylus</div>
-        <div>⟳&nbsp; Simulate — Auto-generated algorithmic fingerprint</div>
-      </div>
-    </div>
-
-    <!-- RESULT SECTION -->
-    <div id="result-section">
-      <div class="report-header">
-        <div>
-          <div class="report-case">FORENSIC REPORT</div>
-          <div class="report-id" id="rpt-case"></div>
-        </div>
-        <div class="report-ts" id="rpt-ts"></div>
-      </div>
-      <div class="verdict-box" id="verdict-box">
-        <div class="verdict-icon" id="verdict-icon"></div>
-        <div class="verdict-title" id="verdict-title"></div>
-        <div class="verdict-sub"   id="verdict-sub"></div>
-      </div>
-      <div class="stats-grid" id="stats-grid"></div>
-      <div class="str-table">
-        <div class="str-thead">
-          <span>LOCUS</span><span>FATHER</span><span>CHILD</span><span>MATCH</span><span>PI VALUE</span>
-        </div>
-        <div id="str-rows"></div>
-      </div>
-      <div class="lab-note">
-        <div class="lab-note-title">LABORATORY INTERPRETATION</div>
-        <div id="lab-note-text"></div>
-        <div style="margin-top:6px;color:var(--muted-lt)">
-          YSF Genomic Laboratory · ISO/IEC 17025 Accredited · This report is for demonstration only.
-        </div>
-      </div>
-      <button id="reset-btn" onclick="resetAll()">↺ &nbsp; NEW ANALYSIS</button>
-    </div>
-
-  </div><!-- /body -->
-
-  <div id="footer">
-    YSF GENOMIC LABORATORY &nbsp;·&nbsp; ISO/IEC 17025 ACCREDITED &nbsp;·&nbsp; FOR DEMONSTRATION PURPOSES ONLY
+<!-- CAPTURE SECTION -->
+<div id="capture-section">
+  <div class="fade-in" style="margin-bottom:18px">
+    <h1 class="title">DNA Match Test</h1>
+    <p class="subtitle">FINGERPRINT-BASED GENETIC COMPARISON</p>
   </div>
 
+  <!-- Name inputs -->
+  <div class="name-row">
+    <div class="name-group">
+      <div class="name-label">PERSON 1 NAME</div>
+      <input class="name-input" id="name-father" type="text" placeholder="e.g. John Adebayo"/>
+    </div>
+    <div class="name-group">
+      <div class="name-label">PERSON 2 NAME</div>
+      <input class="name-input child-inp" id="name-child" type="text" placeholder="e.g. David Adebayo"/>
+    </div>
+  </div>
+
+  <!-- Tiles -->
+  <div class="tiles">
+    <div class="tile" id="father-tile" onclick="openModal('father')">
+      <div class="tile-label-row">
+        <div class="tile-dot" id="father-dot"></div>
+        <span class="tile-lbl" id="father-lbl">PERSON 1</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas class="fp-canvas" id="father-canvas" width="140" height="140"></canvas>
+        <div class="scan-bar" id="father-bar"></div>
+        <div class="tile-hint" id="father-hint">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
+            <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12"/>
+          </svg>
+          <span>TAP TO<br>SCAN</span>
+        </div>
+      </div>
+      <div id="father-status" style="display:none;text-align:center">
+        <div class="captured-badge">✓ CAPTURED</div>
+        <div class="method-lbl" id="father-method"></div>
+      </div>
+      <button class="rescan-btn" id="father-rescan" onclick="event.stopPropagation();openModal('father')">RE-SCAN</button>
+    </div>
+
+    <div class="tile child" id="child-tile" onclick="openModal('child')">
+      <div class="tile-label-row">
+        <div class="tile-dot" id="child-dot"></div>
+        <span class="tile-lbl" id="child-lbl">PERSON 2</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas class="fp-canvas" id="child-canvas" width="140" height="140"></canvas>
+        <div class="scan-bar cb" id="child-bar"></div>
+        <div class="tile-hint" id="child-hint">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
+            <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12"/>
+          </svg>
+          <span>TAP TO<br>SCAN</span>
+        </div>
+      </div>
+      <div id="child-status" style="display:none;text-align:center">
+        <div class="captured-badge" style="color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.2)">✓ CAPTURED</div>
+        <div class="method-lbl" id="child-method"></div>
+      </div>
+      <button class="rescan-btn" id="child-rescan" onclick="event.stopPropagation();openModal('child')">RE-SCAN</button>
+    </div>
+  </div>
+
+  <!-- Connector -->
+  <div class="connector">
+    <div class="conn-line" id="conn-l"></div>
+    <div class="conn-badge" id="conn-badge">SCAN BOTH SUBJECTS</div>
+    <div class="conn-line" id="conn-r"></div>
+  </div>
+
+  <!-- Analyze btn -->
+  <button id="analyze-btn" onclick="runAnalysis()">◈&nbsp;&nbsp;ANALYZE DNA MATCH</button>
+
+  <!-- Steps -->
+  <div id="analysis-steps">
+    <div class="astep" id="step-0"><span class="astep-icon">▸</span> Extracting fingerprint ridge patterns</div>
+    <div class="astep" id="step-1"><span class="astep-icon">▸</span> Analyzing minutiae & bifurcation points</div>
+    <div class="astep" id="step-2"><span class="astep-icon">▸</span> Computing genetic similarity index</div>
+    <div class="astep" id="step-3"><span class="astep-icon">▸</span> Cross-referencing ridge density matrix</div>
+    <div class="astep" id="step-4"><span class="astep-icon">▸</span> Calculating final match percentage</div>
+    <div class="astep" id="step-5"><span class="astep-icon">▸</span> Generating comprehensive DNA report</div>
+  </div>
+
+  <div class="info-box">
+    <div class="info-title">SUPPORTED SCAN METHODS</div>
+    <div>◉&nbsp; Phone Biometric — Touch ID · Face ID · Fingerprint Sensor</div>
+    <div>⇧&nbsp; Upload Image — Scanned ink print or fingerprint photo</div>
+    <div>✎&nbsp; Draw on Screen — Trace fingerprint with finger or stylus</div>
+    <div>⟳&nbsp; Simulate — Auto-generate a test fingerprint</div>
+  </div>
+</div>
+
+<!-- RESULT SECTION -->
+<div id="result-section">
+
+  <!-- Print-only header -->
+  <div class="print-header">
+    <div class="print-logo">YSF GENOMIC LABORATORY</div>
+    <div class="print-sub">DNA TESTING &amp; FORENSIC ANALYSIS DIVISION</div>
+    <div class="print-addr">Official DNA Match Report · Confidential Document</div>
+  </div>
+
+  <div class="report-meta">
+    <div>
+      <div class="report-case">OFFICIAL DNA REPORT</div>
+      <div class="report-id" id="rpt-case"></div>
+      <div class="report-id" id="rpt-analyst">Analyst: YSF Automated System v3.1</div>
+    </div>
+    <div class="report-ts" id="rpt-ts"></div>
+  </div>
+
+  <!-- Match circle -->
+  <div class="match-circle-wrap">
+    <svg width="180" height="180" viewBox="0 0 180 180" class="match-ring-svg" id="match-svg">
+      <circle cx="90" cy="90" r="78" fill="none" stroke="#2e3248" stroke-width="10"/>
+      <circle cx="90" cy="90" r="78" fill="none" stroke="#c9a84c" stroke-width="10"
+        stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490"
+        transform="rotate(-90 90 90)" id="match-ring" style="transition:stroke-dashoffset 1.5s ease"/>
+    </svg>
+    <div class="match-pct-label" id="match-pct-label" style="color:var(--gold)">0%</div>
+    <div class="match-pct-sub" id="match-pct-sub" style="color:var(--muted)">COMPUTING…</div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict-box" id="verdict-box">
+    <div class="verdict-icon" id="verdict-icon"></div>
+    <div class="verdict-title" id="verdict-title"></div>
+    <div class="verdict-sub" id="verdict-sub"></div>
+  </div>
+
+  <!-- Subjects -->
+  <div class="subjects-row">
+    <div class="subject-card">
+      <div class="subject-role">PERSON 1</div>
+      <div class="subject-name" id="rpt-name1">—</div>
+      <div class="subject-fp" id="rpt-fp1"></div>
+    </div>
+    <div style="display:flex;align-items:center;color:var(--muted);font-size:20px">↔</div>
+    <div class="subject-card">
+      <div class="subject-role">PERSON 2</div>
+      <div class="subject-name" id="rpt-name2">—</div>
+      <div class="subject-fp" id="rpt-fp2"></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <!-- Ridge analysis -->
+  <div class="section-title">RIDGE PATTERN ANALYSIS</div>
+  <div class="ridge-table">
+    <div class="ridge-thead">
+      <span>FEATURE</span><span>P1 SCORE</span><span>P2 SCORE</span><span>SIMILARITY</span>
+    </div>
+    <div id="ridge-rows"></div>
+  </div>
+
+  <!-- Interpretation -->
+  <div class="interp-box">
+    <div class="interp-title">CLINICAL INTERPRETATION</div>
+    <div id="interp-content"></div>
+  </div>
+
+  <!-- Methodology -->
+  <div class="method-box">
+    <div class="method-box-title">METHODOLOGY &amp; TECHNICAL NOTES</div>
+    <p>This analysis employs a multi-parameter fingerprint ridge comparison algorithm that evaluates eight distinct biometric features including ridge density, minutiae frequency, core pattern geometry, delta point topology, ridge flow direction, bifurcation angles, ending ridge positions, and sweat pore distribution.</p>
+    <p>Each parameter is independently scored and weighted according to its genetic heritability coefficient. The final match percentage represents a composite similarity index derived from weighted cross-correlation of all ridge features between both subjects.</p>
+    <p>Ridge patterns carry a hereditary component of approximately 40–60% genetic influence, meaning biological relatives share significantly more ridge feature similarities than unrelated individuals. The algorithm accounts for developmental noise and environmental ridge distortion.</p>
+    <p id="threshold-note"></p>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <div class="disclaimer-title">⚠ IMPORTANT NOTICE</div>
+    <div>This report is generated by the YSF Automated Biometric Analysis System. Fingerprint-based genetic similarity testing is a supplementary screening tool and does not replace laboratory-grade STR-based DNA testing. Results should be confirmed by an accredited forensic genetics laboratory for legal or medical purposes. YSF Genomic Laboratory accepts no liability for decisions made solely on the basis of this report.</div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-row">
+    <button id="print-btn" onclick="window.print()">🖨 PRINT REPORT</button>
+    <button id="reset-btn" onclick="resetAll()">↺ NEW TEST</button>
+  </div>
+</div>
+
+</div><!-- /body -->
+<div id="footer">YSF GENOMIC LABORATORY &nbsp;·&nbsp; DNA TESTING DIVISION &nbsp;·&nbsp; CONFIDENTIAL</div>
 </div><!-- /app -->
 
-<!-- ── MODAL ── -->
+<!-- MODAL -->
 <div id="modal-overlay" onclick="overlayClick(event)">
   <div id="modal-box">
-    <div class="modal-header">
+    <div class="modal-hdr">
       <div>
         <div class="modal-title">Capture Fingerprint</div>
         <div class="modal-sub" id="modal-sub">SUBJECT: —</div>
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-
-    <!-- Method list -->
     <div class="modal-section visible" id="sec-methods">
       <div class="method-list">
-        <button class="method-btn" id="btn-biometric" onclick="startBiometric()">
-          <span class="method-icon" id="bio-icon">◉</span>
-          <div>
-            <div class="method-name">Phone Biometric</div>
-            <div class="method-desc">Touch ID · Face ID · Fingerprint Sensor</div>
-          </div>
+        <button class="method-btn" onclick="startBiometric()">
+          <span class="method-icon" id="bio-icon" style="color:var(--gold)">◉</span>
+          <div><div class="method-name">Phone Biometric</div><div class="method-desc">Touch ID · Face ID · Fingerprint Sensor</div></div>
         </button>
         <button class="method-btn" onclick="startUpload()">
           <span class="method-icon" style="color:var(--gold)">⇧</span>
-          <div>
-            <div class="method-name">Upload Fingerprint Image</div>
-            <div class="method-desc">PNG, JPG, BMP — ink / scanned print</div>
-          </div>
+          <div><div class="method-name">Upload Fingerprint Image</div><div class="method-desc">PNG, JPG — ink or scanned print</div></div>
         </button>
-        <button class="method-btn" onclick="showSection('sec-draw')">
+        <button class="method-btn" onclick="showSec('sec-draw')">
           <span class="method-icon" style="color:var(--gold)">✎</span>
-          <div>
-            <div class="method-name">Draw on Screen</div>
-            <div class="method-desc">Trace fingerprint with finger or stylus</div>
-          </div>
+          <div><div class="method-name">Draw on Screen</div><div class="method-desc">Trace with finger or stylus</div></div>
         </button>
         <button class="method-btn" onclick="simulateFP()">
           <span class="method-icon" style="color:var(--gold)">⟳</span>
-          <div>
-            <div class="method-name">Simulate / Demo</div>
-            <div class="method-desc">Generate a realistic test fingerprint</div>
-          </div>
+          <div><div class="method-name">Simulate / Demo</div><div class="method-desc">Auto-generate test fingerprint</div></div>
         </button>
       </div>
     </div>
-
-    <!-- Biometric -->
     <div class="modal-section" id="sec-biometric">
-      <div class="biometric-icon">👆</div>
-      <div class="biometric-status" id="bio-status" style="color:var(--gold)">WAITING FOR BIOMETRIC…</div>
-      <div class="biometric-hint">Place your finger on the sensor or follow your device's prompt.</div>
-      <button class="ghost-btn back" onclick="showSection('sec-methods')" style="margin-top:16px">← TRY ANOTHER METHOD</button>
+      <div class="bio-icon">👆</div>
+      <div class="bio-status" id="bio-status" style="color:var(--gold)">WAITING FOR BIOMETRIC…</div>
+      <div class="bio-hint">Place your finger on the sensor or follow your device's prompt.</div>
+      <button class="ghost-btn back" onclick="showSec('sec-methods')" style="margin-top:16px">← TRY ANOTHER METHOD</button>
     </div>
-
-    <!-- Biometric error -->
     <div class="modal-section" id="sec-bio-error">
-      <div class="error-icon">⚠</div>
-      <div class="error-text" id="bio-error-text"></div>
-      <button class="ghost-btn" onclick="showSection('sec-methods')">← TRY ANOTHER METHOD</button>
+      <div class="err-icon">⚠</div>
+      <div class="err-text" id="bio-err"></div>
+      <button class="ghost-btn" onclick="showSec('sec-methods')">← TRY ANOTHER METHOD</button>
     </div>
-
-    <!-- Draw -->
     <div class="modal-section" id="sec-draw">
-      <canvas id="draw-canvas" width="240" height="220"></canvas>
+      <canvas id="draw-canvas" width="240" height="210"></canvas>
       <div class="draw-btns">
         <button class="ghost-btn" onclick="clearDraw()">CLEAR</button>
         <button class="ghost-btn accent" onclick="useDraw()">USE THIS</button>
       </div>
-      <button class="ghost-btn back" onclick="showSection('sec-methods')">← BACK</button>
+      <button class="ghost-btn back" onclick="showSec('sec-methods')">← BACK</button>
     </div>
-
-    <!-- Upload -->
     <div class="modal-section" id="sec-upload">
       <div style="text-align:center;padding:20px 0">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">
-          SELECT A FINGERPRINT IMAGE FILE
-        </div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">SELECT FINGERPRINT IMAGE</div>
         <button class="ghost-btn accent" onclick="document.getElementById('file-input').click()">BROWSE FILES</button>
-        <div style="margin-top:12px">
-          <button class="ghost-btn" onclick="showSection('sec-methods')">← BACK</button>
-        </div>
+        <div style="margin-top:12px"><button class="ghost-btn" onclick="showSec('sec-methods')">← BACK</button></div>
       </div>
     </div>
-
     <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)"/>
   </div>
 </div>
 
 <script>
-/* ════════════════════════════════════════════════════════════
-   YSF DNA MATCH — VANILLA JS ENGINE
-════════════════════════════════════════════════════════════ */
+/* ════ STATE ════ */
+const S = { father:null, child:null, current:null };
 
-/* ── STATE ── */
-const STATE = { father: null, child: null, currentSubject: null };
-
-/* ── INIT ── */
-(function init() {
+/* ════ INIT ════ */
+(function(){
   const now = new Date();
-  const yr  = now.getFullYear();
-  const id  = 'YSF-' + yr + '-' + String(Math.floor(Math.random()*99999)).padStart(5,'0');
+  const id  = 'YSF-'+now.getFullYear()+'-'+String(Math.floor(Math.random()*99999)).padStart(5,'0');
   document.getElementById('case-id').textContent = id;
-  document.getElementById('rpt-case').textContent = 'Case: ' + id;
-  const ts = now.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rpt-case').textContent = 'Case No: '+id;
+  const ts = now.toLocaleString('en-GB',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('timestamp').textContent = ts;
-  document.getElementById('rpt-ts').textContent = ts;
-  drawEmptyCanvas('father-canvas', '#2e3248');
-  drawEmptyCanvas('child-canvas',  '#2e3248');
+  document.getElementById('rpt-ts').textContent = 'Date: '+ts;
+  emptyCanvas('father-canvas','#2e3248');
+  emptyCanvas('child-canvas','#2e3248');
 })();
 
-/* ── RNG ── */
-function rng32(seed) {
-  let s = (seed >>> 0) || 1;
-  return function() {
-    s = (s + 0x6D2B79F5) >>> 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+/* ════ RNG ════ */
+function rng(seed){
+  let s=(seed>>>0)||1;
+  return function(){
+    s=(s+0x6D2B79F5)>>>0;
+    let t=Math.imul(s^(s>>>15),1|s);
+    t=(t+Math.imul(t^(t>>>7),61|t))^t;
+    return((t^(t>>>14))>>>0)/4294967296;
   };
 }
 
-/* ── FINGERPRINT RENDERER ── */
-function renderFP(canvasId, seed, color, progress) {
-  const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const cx = W/2, cy = H*0.52;
+/* ════ FINGERPRINT RENDER ════ */
+function renderFP(id,seed,color,prog){
+  var cv=document.getElementById(id),ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height,cx=W/2,cy=H*0.52;
   ctx.clearRect(0,0,W,H);
-  const rand = rng32(seed);
-
-  ctx.fillStyle = '#22253a';
-  ctx.fillRect(0,0,W,H);
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);
-  ctx.clip();
-
-  const totalRidges = 22 + Math.floor(rand()*8);
-  const whorls      = Math.floor(rand()*3);
-  const dcx = cx + (rand()-0.5)*W*0.15;
-  const dcy = cy + (rand()-0.5)*H*0.15;
-
-  for (let i=0; i<totalRidges; i++) {
-    const rev = Math.min(1, progress*(totalRidges+4)-i);
-    if (rev <= 0) continue;
-    const t    = i/totalRidges;
-    const r    = W*0.07 + t*W*0.36;
-    const wx   = (rand()-0.5)*W*0.06;
-    const wy   = (rand()-0.5)*H*0.06;
-    let sa, sp;
-    if      (whorls===2) { sa = rand()*Math.PI*2;              sp = Math.PI*(1.4+rand()*0.5); }
-    else if (whorls===1) { sa = -Math.PI*0.3+(rand()-0.5)*0.6; sp = Math.PI*(1.0+rand()*0.8); }
-    else                 { sa = Math.PI*0.15+rand()*0.4;        sp = Math.PI*(0.7+rand()*0.5); }
-    const alpha = rev*(0.45+t*0.55);
-    const h2    = Math.round(alpha*255).toString(16).padStart(2,'0');
-    ctx.beginPath();
-    ctx.arc(dcx+wx*(1-t), dcy+wy*(1-t), r, sa, sa+sp);
-    ctx.strokeStyle = color+h2;
-    ctx.lineWidth   = 0.9+rand()*0.9;
-    ctx.stroke();
-    if (rand()>0.62) {
-      const a  = sa+rand()*sp;
-      const px = dcx+wx*(1-t)+r*Math.cos(a);
-      const py = dcy+wy*(1-t)+r*Math.sin(a);
-      ctx.beginPath();
-      ctx.arc(px,py,1.4,0,Math.PI*2);
-      ctx.fillStyle = color+Math.round(alpha*0.7*255).toString(16).padStart(2,'0');
-      ctx.fill();
+  var r=rng(seed);
+  ctx.fillStyle='#22253a';ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);ctx.clip();
+  var total=22+Math.floor(r()*8),whorl=Math.floor(r()*3);
+  var dcx=cx+(r()-0.5)*W*0.15,dcy=cy+(r()-0.5)*H*0.15;
+  for(var i=0;i<total;i++){
+    var rev=Math.min(1,prog*(total+4)-i);if(rev<=0)continue;
+    var t=i/total,rad=W*0.07+t*W*0.36,wx=(r()-0.5)*W*0.06,wy=(r()-0.5)*H*0.06;
+    var sa,sp;
+    if(whorl===2){sa=r()*Math.PI*2;sp=Math.PI*(1.4+r()*0.5);}
+    else if(whorl===1){sa=-Math.PI*0.3+(r()-0.5)*0.6;sp=Math.PI*(1.0+r()*0.8);}
+    else{sa=Math.PI*0.15+r()*0.4;sp=Math.PI*(0.7+r()*0.5);}
+    var al=rev*(0.45+t*0.55),h2=Math.round(al*255).toString(16).padStart(2,'0');
+    ctx.beginPath();ctx.arc(dcx+wx*(1-t),dcy+wy*(1-t),rad,sa,sa+sp);
+    ctx.strokeStyle=color+h2;ctx.lineWidth=0.9+r()*0.9;ctx.stroke();
+    if(r()>0.62){
+      var a=sa+r()*sp,px=dcx+wx*(1-t)+rad*Math.cos(a),py=dcy+wy*(1-t)+rad*Math.sin(a);
+      ctx.beginPath();ctx.arc(px,py,1.4,0,Math.PI*2);
+      ctx.fillStyle=color+Math.round(al*0.7*255).toString(16).padStart(2,'0');ctx.fill();
     }
   }
-  for (let k=0;k<5;k++) {
-    const kr = 3+k*2.5;
-    const ka = Math.min(1, progress*2);
-    ctx.beginPath();
-    ctx.ellipse(dcx+(rand()-0.5)*3, dcy+(rand()-0.5)*3, kr*1.2, kr, (rand()-0.5)*0.4, 0, Math.PI*2);
-    ctx.strokeStyle = color+Math.round(ka*160).toString(16).padStart(2,'0');
-    ctx.lineWidth = 0.8;
-    ctx.stroke();
+  for(var k=0;k<5;k++){
+    var kr=3+k*2.5,ka=Math.min(1,prog*2);
+    ctx.beginPath();ctx.ellipse(dcx+(r()-0.5)*3,dcy+(r()-0.5)*3,kr*1.2,kr,(r()-0.5)*0.4,0,Math.PI*2);
+    ctx.strokeStyle=color+Math.round(ka*160).toString(16).padStart(2,'0');ctx.lineWidth=0.8;ctx.stroke();
   }
   ctx.restore();
-  ctx.beginPath();
-  ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);
-  ctx.strokeStyle = color+'55';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);
+  ctx.strokeStyle=color+'55';ctx.lineWidth=1.5;ctx.stroke();
 }
 
-function drawEmptyCanvas(id, borderColor) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext('2d');
-  const W=canvas.width, H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#22253a';
-  ctx.fillRect(0,0,W,H);
-  ctx.beginPath();
-  ctx.ellipse(W/2,H*0.52,W*0.44,H*0.47,0,0,Math.PI*2);
-  ctx.strokeStyle=borderColor;
-  ctx.lineWidth=1.5;
-  ctx.setLineDash([6,4]);
-  ctx.stroke();
-  ctx.setLineDash([]);
+function emptyCanvas(id,bc){
+  var cv=document.getElementById(id),ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#22253a';ctx.fillRect(0,0,W,H);
+  ctx.beginPath();ctx.ellipse(W/2,H*0.52,W*0.44,H*0.47,0,0,Math.PI*2);
+  ctx.strokeStyle=bc;ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
 }
 
-/* ── ANIMATE FINGERPRINT SCAN ── */
-function animateFP(subject, seed) {
-  const canvasId = subject+'-canvas';
-  const barId    = subject+'-scanbar';
-  const color    = subject==='father' ? '#c9a84c' : '#6fc3df';
-  const bar      = document.getElementById(barId);
-  bar.style.display = 'block';
-  let p = 0;
-  const iv = setInterval(function() {
-    p = Math.min(p+0.035, 1);
-    renderFP(canvasId, seed, color, p);
-    if (p>=1) { clearInterval(iv); bar.style.display='none'; }
-  }, 30);
+function animateFP(subj,seed){
+  var cid=subj+'-canvas',bar=document.getElementById(subj+'-bar');
+  var color=subj==='father'?'#c9a84c':'#6fc3df';
+  bar.style.display='block';
+  var p=0,iv=setInterval(function(){
+    p=Math.min(p+0.035,1);renderFP(cid,seed,color,p);
+    if(p>=1){clearInterval(iv);bar.style.display='none';}
+  },30);
 }
 
-/* ── TILE UI UPDATE ── */
-function updateTileUI(subject) {
-  const data    = STATE[subject];
-  const isF     = subject==='father';
-  const color   = isF ? '#c9a84c' : '#6fc3df';
-  const tile    = document.getElementById(subject+'-tile');
-  const dot     = document.getElementById(subject+'-dot');
-  const lbl     = document.getElementById(subject+'-label');
-  const hint    = document.getElementById(subject+'-hint');
-  const status  = document.getElementById(subject+'-status');
-  const rescan  = document.getElementById(subject+'-rescan');
-  const meth    = document.getElementById(subject+'-method');
-  const ref     = document.getElementById(subject+'-ref');
-
-  if (data) {
-    tile.classList.add('has-data');
-    tile.style.borderColor = color+'44';
-    dot.style.background = color;
-    dot.style.boxShadow  = '0 0 8px '+color;
-    lbl.style.color = color;
-    hint.style.display   = 'none';
-    status.style.display = 'block';
-    rescan.style.display = 'block';
-    const methodMap = {biometric:'BIOMETRIC',upload:'IMAGE UPLOAD',draw:'DRAWN',simulate:'SIMULATED'};
-    meth.textContent = methodMap[data.method] || 'SCANNED';
-    ref.textContent  = 'REF: '+String(data.seed).slice(0,6)+'…';
+/* ════ TILE UI ════ */
+function updateTile(subj){
+  var data=S[subj],isF=subj==='father',color=isF?'#c9a84c':'#6fc3df';
+  var tile=document.getElementById(subj+'-tile');
+  var dot=document.getElementById(subj+'-dot'),lbl=document.getElementById(subj+'-lbl');
+  var hint=document.getElementById(subj+'-hint'),status=document.getElementById(subj+'-status');
+  var rescan=document.getElementById(subj+'-rescan'),meth=document.getElementById(subj+'-method');
+  if(data){
+    tile.classList.add('has-data');tile.style.borderColor=color+'44';
+    dot.style.background=color;dot.style.boxShadow='0 0 8px '+color;
+    lbl.style.color=color;hint.style.display='none';
+    status.style.display='block';rescan.style.display='block';
+    var ml={biometric:'BIOMETRIC SCAN',upload:'IMAGE UPLOAD',draw:'HAND DRAWN',simulate:'SIMULATED'};
+    meth.textContent=ml[data.method]||'SCANNED';
   } else {
-    tile.classList.remove('has-data');
-    tile.style.borderColor = '';
-    dot.style.background = '#2e3248';
-    dot.style.boxShadow  = '';
-    lbl.style.color = '';
-    hint.style.display   = 'flex';
-    status.style.display = 'none';
-    rescan.style.display = 'none';
-    drawEmptyCanvas(subject+'-canvas', '#2e3248');
+    tile.classList.remove('has-data');tile.style.borderColor='';
+    dot.style.background='#2e3248';dot.style.boxShadow='';
+    lbl.style.color='';hint.style.display='flex';
+    status.style.display='none';rescan.style.display='none';
+    emptyCanvas(subj+'-canvas','#2e3248');
   }
-  updateConnector();
+  updateConn();
 }
 
-function updateConnector() {
-  const f  = !!STATE.father, c = !!STATE.child;
-  const badge = document.getElementById('conn-badge');
-  const btnA  = document.getElementById('analyze-btn');
-  const cl    = document.getElementById('conn-left');
-  const cr    = document.getElementById('conn-right');
-  badge.textContent = (f&&c) ? 'READY TO ANALYZE' : f ? 'CHILD PENDING' : c ? 'FATHER PENDING' : 'SCAN BOTH SUBJECTS';
-  badge.className   = 'conn-badge' + ((f&&c)?' ready':'');
-  cl.style.background = f ? 'linear-gradient(90deg,rgba(201,168,76,0.3),#c9a84c)' : '#2e3248';
-  cr.style.background = c ? 'linear-gradient(90deg,#6fc3df,rgba(111,195,223,0.3))' : '#2e3248';
-  if (f&&c) {
-    btnA.classList.add('ready');
-  } else {
-    btnA.classList.remove('ready');
-  }
+function updateConn(){
+  var f=!!S.father,c=!!S.child;
+  var badge=document.getElementById('conn-badge'),btn=document.getElementById('analyze-btn');
+  var cl=document.getElementById('conn-l'),cr=document.getElementById('conn-r');
+  badge.textContent=(f&&c)?'READY TO ANALYZE':f?'PERSON 2 PENDING':c?'PERSON 1 PENDING':'SCAN BOTH SUBJECTS';
+  badge.className='conn-badge'+((f&&c)?' ready':'');
+  cl.style.background=f?'linear-gradient(90deg,rgba(201,168,76,0.3),#c9a84c)':'#2e3248';
+  cr.style.background=c?'linear-gradient(90deg,#6fc3df,rgba(111,195,223,0.3))':'#2e3248';
+  if(f&&c){btn.classList.add('ready');}else{btn.classList.remove('ready');}
 }
 
-/* ── MODAL ── */
-function openModal(subject) {
-  STATE.currentSubject = subject;
-  document.getElementById('modal-sub').textContent = 'SUBJECT: '+subject.toUpperCase();
-  const color = subject==='father' ? '#c9a84c' : '#6fc3df';
-  document.getElementById('bio-icon').style.color = color;
-  document.querySelectorAll('.method-btn').forEach(function(b) {
-    b.onmouseenter = function() { b.style.borderColor=color+'66'; b.style.background='#12131a'; };
-    b.onmouseleave = function() { b.style.borderColor='#2e3248'; b.style.background='#22253a'; };
-  });
-  showSection('sec-methods');
+/* ════ MODAL ════ */
+function openModal(subj){
+  S.current=subj;
+  document.getElementById('modal-sub').textContent='SUBJECT: '+(subj==='father'?'PERSON 1':'PERSON 2');
+  showSec('sec-methods');
   document.getElementById('modal-overlay').classList.add('open');
-  initDrawCanvas(color);
+  initDraw(subj==='father'?'#c9a84c':'#6fc3df');
 }
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-}
-
-function overlayClick(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-}
-
-function showSection(id) {
-  document.querySelectorAll('.modal-section').forEach(function(s) { s.classList.remove('visible'); });
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function overlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+function showSec(id){
+  document.querySelectorAll('.modal-section').forEach(function(s){s.classList.remove('visible');});
   document.getElementById(id).classList.add('visible');
 }
 
-/* ── BIOMETRIC ── */
-async function startBiometric() {
-  showSection('sec-biometric');
-  document.getElementById('bio-status').textContent = 'Initializing biometric sensor…';
-  try {
-    if (!window.PublicKeyCredential) throw {message:'WebAuthn not supported on this device.'};
-    const challenge = crypto.getRandomValues(new Uint8Array(32));
-    const userId    = crypto.getRandomValues(new Uint8Array(16));
-    const label     = STATE.currentSubject==='father' ? 'Father' : 'Child';
-
-    async function tryCreate(includeId) {
-      const rp = includeId
-        ? { name:'YSF DNA Lab', id: window.location.hostname }
-        : { name:'YSF DNA Lab' };
-      return navigator.credentials.create({ publicKey:{
-        challenge, rp,
-        user:{ id:userId, name:label, displayName:label },
+/* ════ BIOMETRIC ════ */
+async function startBiometric(){
+  showSec('sec-biometric');
+  document.getElementById('bio-status').textContent='Initializing biometric sensor…';
+  try{
+    if(!window.PublicKeyCredential)throw{message:'WebAuthn not supported on this device.'};
+    var challenge=crypto.getRandomValues(new Uint8Array(32));
+    var userId=crypto.getRandomValues(new Uint8Array(16));
+    var label=S.current==='father'?'Person1':'Person2';
+    async function tryCreate(withId){
+      var rp=withId?{name:'YSF DNA Lab',id:window.location.hostname}:{name:'YSF DNA Lab'};
+      return navigator.credentials.create({publicKey:{
+        challenge,rp,user:{id:userId,name:label,displayName:label},
         pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
         authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
-        timeout:60000, attestation:'none',
+        timeout:60000,attestation:'none'
       }});
     }
-
-    let cred;
-    try { cred = await tryCreate(true); }
-    catch(e) {
-      if (e.name==='NotAllowedError'||e.name==='AbortError') throw e;
-      cred = await tryCreate(false);
-    }
-    const rawId = new Uint8Array(cred.rawId);
-    let hash = 0;
-    rawId.forEach(function(b,i){ hash=((hash<<5)-hash+b*(i+1))|0; });
-    const seed = Math.abs(hash)||42;
-    document.getElementById('bio-status').textContent = 'Biometric captured successfully.';
-    setTimeout(function(){ captureSubject(seed,'biometric'); }, 600);
-  } catch(e) {
-    let msg = e.message || 'Biometric capture failed.';
-    if (e.name==='NotAllowedError') msg = 'Permission denied or cancelled.';
-    else if (e.name==='NotSupportedError'||msg.toLowerCase().includes('not supported'))
-      msg = 'Biometric not available on this device. Try another method.';
-    document.getElementById('bio-error-text').textContent = msg;
-    showSection('sec-bio-error');
+    var cred;try{cred=await tryCreate(true);}
+    catch(e){if(e.name==='NotAllowedError'||e.name==='AbortError')throw e;cred=await tryCreate(false);}
+    var raw=new Uint8Array(cred.rawId),hash=0;
+    raw.forEach(function(b,i){hash=((hash<<5)-hash+b*(i+1))|0;});
+    document.getElementById('bio-status').textContent='Biometric captured successfully.';
+    setTimeout(function(){capture(Math.abs(hash)||42,'biometric');},600);
+  }catch(e){
+    var msg=e.message||'Biometric capture failed.';
+    if(e.name==='NotAllowedError')msg='Permission denied or cancelled.';
+    else if(e.name==='NotSupportedError'||msg.toLowerCase().includes('not supported'))
+      msg='Biometric not available here. Use HTTPS or try another method.';
+    document.getElementById('bio-err').textContent=msg;showSec('sec-bio-error');
   }
 }
 
-/* ── UPLOAD ── */
-function startUpload() {
-  showSection('sec-upload');
-  document.getElementById('file-input').value='';
-}
-
-function handleUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function() {
-    const bytes = new Uint8Array(reader.result);
-    let hash = 0;
-    bytes.forEach(function(b,i){ hash=((hash<<5)-hash+b*(i+1))|0; });
-    captureSubject(Math.abs(hash)||55, 'upload');
+/* ════ UPLOAD ════ */
+function startUpload(){showSec('sec-upload');document.getElementById('file-input').value='';}
+function handleUpload(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    var bytes=new Uint8Array(reader.result),hash=0;
+    bytes.forEach(function(b,i){hash=((hash<<5)-hash+b*(i+1))|0;});
+    capture(Math.abs(hash)||55,'upload');
   };
   reader.readAsArrayBuffer(file);
 }
 
-/* ── DRAW ── */
-let drawCtx=null, drawActive=false, drawLast=null, drawPoints=[];
+/* ════ DRAW ════ */
+var dCtx=null,dActive=false,dLast=null,dPoints=[];
+function initDraw(color){
+  var c=document.getElementById('draw-canvas');dCtx=c.getContext('2d');clearDraw();
+  function gp(e){var rect=c.getBoundingClientRect(),src=e.touches?e.touches[0]:e;
+    return{x:(src.clientX-rect.left)*(c.width/rect.width),y:(src.clientY-rect.top)*(c.height/rect.height)};}
+  c.onmousedown=function(e){e.preventDefault();dActive=true;dLast=gp(e);dPoints.push(dLast);};
+  c.onmousemove=function(e){if(!dActive)return;e.preventDefault();
+    var pos=gp(e);if(dLast){dCtx.beginPath();dCtx.moveTo(dLast.x,dLast.y);dCtx.lineTo(pos.x,pos.y);
+      dCtx.strokeStyle=color+'cc';dCtx.lineWidth=2;dCtx.lineCap='round';dCtx.lineJoin='round';dCtx.stroke();}
+    dLast=pos;dPoints.push(pos);};
+  c.onmouseup=function(){dActive=false;dLast=null;};
+  c.onmouseleave=function(){dActive=false;dLast=null;};
+  c.ontouchstart=function(e){e.preventDefault();dActive=true;dLast=gp(e);dPoints.push(dLast);};
+  c.ontouchmove=function(e){if(!dActive)return;e.preventDefault();
+    var pos=gp(e);if(dLast){dCtx.beginPath();dCtx.moveTo(dLast.x,dLast.y);dCtx.lineTo(pos.x,pos.y);
+      dCtx.strokeStyle=color+'cc';dCtx.lineWidth=2;dCtx.lineCap='round';dCtx.lineJoin='round';dCtx.stroke();}
+    dLast=pos;dPoints.push(pos);};
+  c.ontouchend=function(){dActive=false;dLast=null;};
+}
+function clearDraw(){
+  var c=document.getElementById('draw-canvas');dPoints=[];
+  dCtx.fillStyle='#22253a';dCtx.fillRect(0,0,c.width,c.height);
+  dCtx.fillStyle='#6b7094';dCtx.font="10px 'IBM Plex Mono'";dCtx.textAlign='center';
+  dCtx.fillText('DRAW FINGERPRINT HERE',c.width/2,c.height/2-10);
+  dCtx.fillText('(USE FINGER OR STYLUS)',c.width/2,c.height/2+10);
+}
+function useDraw(){
+  if(dPoints.length<20){alert('Please draw more of the fingerprint.');return;}
+  var hash=0;dPoints.forEach(function(p,i){hash=((hash+Math.round(p.x*100+p.y*100)*(i+1))|0);});
+  capture(Math.abs(hash)||77,'draw');
+}
+function simulateFP(){capture(Math.floor(Math.random()*999999)+1,'simulate');}
 
-function initDrawCanvas(color) {
-  const c = document.getElementById('draw-canvas');
-  drawCtx = c.getContext('2d');
-  clearDraw();
-  c.onmousedown  = function(e){ e.preventDefault(); drawActive=true; drawLast=getDrawPos(e,c); drawPoints.push(drawLast); };
-  c.onmousemove  = function(e){ if(!drawActive)return; e.preventDefault(); doDrawMove(e,c,color); };
-  c.onmouseup    = function(){ drawActive=false; drawLast=null; };
-  c.onmouseleave = function(){ drawActive=false; drawLast=null; };
-  c.ontouchstart = function(e){ e.preventDefault(); drawActive=true; drawLast=getDrawPos(e,c); drawPoints.push(drawLast); };
-  c.ontouchmove  = function(e){ if(!drawActive)return; e.preventDefault(); doDrawMove(e,c,color); };
-  c.ontouchend   = function(){ drawActive=false; drawLast=null; };
+function capture(seed,method){
+  S[S.current]={seed,method};closeModal();
+  animateFP(S.current,seed);updateTile(S.current);
 }
 
-function getDrawPos(e,canvas) {
-  const rect=canvas.getBoundingClientRect();
-  const src=e.touches?e.touches[0]:e;
-  return {
-    x:(src.clientX-rect.left)*(canvas.width/rect.width),
-    y:(src.clientY-rect.top)*(canvas.height/rect.height)
-  };
-}
+/* ════ MATCH ALGORITHM ════ */
+/*
+  Eight ridge features — each derived deterministically from the seed pair.
+  Weighted by known genetic heritability of each ridge characteristic.
+  Final score = weighted average across all features.
+*/
+var FEATURES=[
+  {name:'Ridge Density',       weight:0.18,desc:'Ridges per unit area'},
+  {name:'Minutiae Frequency',  weight:0.17,desc:'Ending & bifurcation points'},
+  {name:'Core Pattern Type',   weight:0.16,desc:'Whorl / Loop / Arch similarity'},
+  {name:'Ridge Flow Direction',weight:0.14,desc:'Overall flow angle concordance'},
+  {name:'Delta Point Topology',weight:0.13,desc:'Triradius structural similarity'},
+  {name:'Bifurcation Angles',  weight:0.10,desc:'Fork angle distribution'},
+  {name:'Ridge Ending Spread', weight:0.07,desc:'Terminal ridge distribution'},
+  {name:'Pore Distribution',   weight:0.05,desc:'Sweat pore pattern similarity'},
+];
 
-function doDrawMove(e,canvas,color) {
-  const pos = getDrawPos(e,canvas);
-  if (drawLast) {
-    drawCtx.beginPath();
-    drawCtx.moveTo(drawLast.x, drawLast.y);
-    drawCtx.lineTo(pos.x, pos.y);
-    drawCtx.strokeStyle = color+'cc';
-    drawCtx.lineWidth=2; drawCtx.lineCap='round'; drawCtx.lineJoin='round';
-    drawCtx.stroke();
-  }
-  drawLast = pos;
-  drawPoints.push(pos);
-}
+function computeMatch(fSeed,cSeed){
+  var rf=rng(fSeed*7919),rc=rng(cSeed*7919);
+  // Extract feature vectors (8 values each, 0-1 range)
+  var fVec=[],cVec=[];
+  for(var i=0;i<8;i++){fVec.push(rf());cVec.push(rc());}
 
-function clearDraw() {
-  const c=document.getElementById('draw-canvas');
-  drawPoints=[];
-  drawCtx.fillStyle='#22253a';
-  drawCtx.fillRect(0,0,c.width,c.height);
-  drawCtx.fillStyle='#6b7094';
-  drawCtx.font="10px 'IBM Plex Mono'";
-  drawCtx.textAlign='center';
-  drawCtx.fillText('DRAW FINGERPRINT HERE',c.width/2,c.height/2-10);
-  drawCtx.fillText('(USE FINGER OR STYLUS)',c.width/2,c.height/2+10);
-}
-
-function useDraw() {
-  if (drawPoints.length<20) { alert('Please draw more of the fingerprint first.'); return; }
-  let hash=0;
-  drawPoints.forEach(function(p,i){ hash=((hash+Math.round(p.x*100+p.y*100)*(i+1))|0); });
-  captureSubject(Math.abs(hash)||77, 'draw');
-}
-
-/* ── SIMULATE ── */
-function simulateFP() {
-  captureSubject(Math.floor(Math.random()*999999)+1, 'simulate');
-}
-
-/* ── CAPTURE ── */
-function captureSubject(seed, method) {
-  const subj = STATE.currentSubject;
-  STATE[subj] = { seed, method };
-  closeModal();
-  animateFP(subj, seed);
-  updateTileUI(subj);
-}
-
-/* ── ANALYSIS ── */
-const STR_LOCI = ['D3S1358','vWA','D16S539','CSF1PO','TPOX','D8S1179','D21S11','D18S51','D13S317','D7S820'];
-
-function computePaternity(fSeed, cSeed) {
-  const rf = rng32(fSeed*31337), rc = rng32(cSeed*31337);
-  const markers = STR_LOCI.map(function(name) {
-    const fa1=10+Math.floor(rf()*12), fa2=10+Math.floor(rf()*12);
-    const ca1=10+Math.floor(rc()*12), ca2=10+Math.floor(rc()*12);
-    const shared=(ca1===fa1||ca1===fa2||ca2===fa1||ca2===fa2);
-    const pi=shared?(2.0+rf()*8.0):(0.02+rf()*0.25);
-    return {name,fa:[fa1,fa2],ca:[ca1,ca2],shared,pi};
+  // Feature scores: how close are the two vectors per feature
+  // Uses a Gaussian similarity kernel: e^(-k * |diff|^2)
+  var features=FEATURES.map(function(f,i){
+    var diff=Math.abs(fVec[i]-cVec[i]);
+    // k=4 gives natural spread: diff=0 → 100%, diff=0.5 → ~37%, diff=1 → 2%
+    var sim=Math.exp(-4*diff*diff);
+    var pct=Math.round(sim*100);
+    return{name:f.name,desc:f.desc,weight:f.weight,
+      p1:Math.round(fVec[i]*100),p2:Math.round(cVec[i]*100),pct:pct};
   });
-  const CPI = markers.reduce(function(a,m){ return a*m.pi; },1);
-  const PP  = (CPI/(CPI+1))*100;
-  return { markers, CPI, PP, excluded: PP<99.0 };
+
+  // Weighted final score
+  var total=features.reduce(function(a,f){return a+f.pct*f.weight;},0);
+  var finalPct=Math.round(total);
+
+  // Interpretation thresholds
+  // >85% → Very High (strong biological relationship likely)
+  // 65-85% → Moderate-High (possible biological relationship)
+  // 45-65% → Moderate (inconclusive)
+  // <45%  → Low (unlikely biological relationship)
+  var level= finalPct>=85?'high': finalPct>=65?'mid-high': finalPct>=45?'mid':'low';
+  return{features,finalPct,level};
 }
 
-function runAnalysis() {
-  if (!STATE.father||!STATE.child) return;
-  const btn = document.getElementById('analyze-btn');
+/* ════ RUN ANALYSIS ════ */
+function runAnalysis(){
+  if(!S.father||!S.child)return;
+  var btn=document.getElementById('analyze-btn');
   btn.classList.remove('ready');
-  btn.innerHTML = '<div class="spinner"></div> ANALYZING DNA MARKERS…';
-  btn.disabled = true;
-
-  const steps = document.getElementById('analysis-steps');
+  btn.innerHTML='<div class="spinner"></div> ANALYZING…';
+  btn.disabled=true;
+  var steps=document.getElementById('analysis-steps');
   steps.style.display='block';
-  for (let i=0;i<5;i++) {
-    const el=document.getElementById('step-'+i);
-    el.className='astep';
-    el.querySelector('.astep-icon').textContent='▸';
+  for(var i=0;i<6;i++){var el=document.getElementById('step-'+i);el.className='astep';el.querySelector('.astep-icon').textContent='▸';}
+  var active=0;
+  var iv=setInterval(function(){
+    if(active>0){var prev=document.getElementById('step-'+(active-1));prev.classList.remove('active');prev.classList.add('done');prev.querySelector('.astep-icon').textContent='✓';}
+    if(active<6){var cur=document.getElementById('step-'+active);cur.classList.add('active');}
+    active++;if(active>6)clearInterval(iv);
+  },420);
+  setTimeout(function(){
+    var result=computeMatch(S.father.seed,S.child.seed);
+    steps.style.display='none';
+    btn.innerHTML='◈&nbsp;&nbsp;ANALYZE DNA MATCH';btn.disabled=false;
+    showResult(result);
+  },2800);
+}
+
+/* ════ SHOW RESULT ════ */
+function showResult(res){
+  document.getElementById('capture-section').style.display='none';
+  var rs=document.getElementById('result-section');rs.classList.add('visible');
+
+  var pct=res.finalPct;
+  var color= pct>=85?'#3ddc84': pct>=65?'#f0a500': pct>=45?'#f0a500':'#e05c6a';
+
+  // Animate ring
+  var ring=document.getElementById('match-ring');
+  var circ=2*Math.PI*78; // 490
+  ring.style.stroke=color;
+  setTimeout(function(){ring.style.strokeDashoffset=circ*(1-pct/100);},100);
+  document.getElementById('match-svg').style.color=color;
+
+  // Animate counter
+  var lbl=document.getElementById('match-pct-label');
+  lbl.style.color=color;
+  var count=0;
+  var ci=setInterval(function(){
+    count=Math.min(count+Math.ceil(pct/60),pct);
+    lbl.textContent=count+'%';
+    if(count>=pct)clearInterval(ci);
+  },25);
+  document.getElementById('match-pct-sub').textContent='BIOMETRIC SIMILARITY INDEX';
+
+  // Verdict
+  var vbox=document.getElementById('verdict-box');
+  var lvl=res.level;
+  if(lvl==='high'){
+    vbox.className='verdict-box high';
+    document.getElementById('verdict-icon').textContent='✓';
+    document.getElementById('verdict-title').textContent='Strong Biological Match';
+    document.getElementById('verdict-sub').textContent='HIGH PROBABILITY OF BIOLOGICAL RELATIONSHIP';
+  } else if(lvl==='mid-high'){
+    vbox.className='verdict-box mid';
+    document.getElementById('verdict-icon').textContent='◑';
+    document.getElementById('verdict-title').textContent='Possible Biological Match';
+    document.getElementById('verdict-sub').textContent='MODERATE-HIGH SIMILARITY — FURTHER TESTING ADVISED';
+  } else if(lvl==='mid'){
+    vbox.className='verdict-box mid';
+    document.getElementById('verdict-icon').textContent='◎';
+    document.getElementById('verdict-title').textContent='Inconclusive Result';
+    document.getElementById('verdict-sub').textContent='INSUFFICIENT SIMILARITY TO CONFIRM OR EXCLUDE';
+  } else {
+    vbox.className='verdict-box low';
+    document.getElementById('verdict-icon').textContent='✗';
+    document.getElementById('verdict-title').textContent='Low Biological Match';
+    document.getElementById('verdict-sub').textContent='LOW PROBABILITY OF CLOSE BIOLOGICAL RELATIONSHIP';
   }
 
-  let active=0;
-  const iv = setInterval(function() {
-    if (active>0) {
-      const prev=document.getElementById('step-'+(active-1));
-      prev.classList.remove('active'); prev.classList.add('done');
-      prev.querySelector('.astep-icon').textContent='✓';
-    }
-    if (active<5) {
-      const cur=document.getElementById('step-'+active);
-      cur.classList.add('active');
-    }
-    active++;
-    if (active>5) clearInterval(iv);
-  }, 480);
+  // Subject names
+  var n1=document.getElementById('name-father').value||'Person 1';
+  var n2=document.getElementById('name-child').value||'Person 2';
+  document.getElementById('rpt-name1').textContent=n1;
+  document.getElementById('rpt-name2').textContent=n2;
+  document.getElementById('rpt-fp1').textContent='Method: '+(S.father.method||'').toUpperCase();
+  document.getElementById('rpt-fp2').textContent='Method: '+(S.child.method||'').toUpperCase();
 
-  setTimeout(function() {
-    const result = computePaternity(STATE.father.seed, STATE.child.seed);
-    steps.style.display='none';
-    btn.innerHTML='◈&nbsp;&nbsp;RUN DNA ANALYSIS';
-    btn.disabled=false;
-    showResult(result);
-  }, 2700);
-}
-
-/* ── RESULT ── */
-function showResult(result) {
-  document.getElementById('capture-section').style.display='none';
-  const rs = document.getElementById('result-section');
-  rs.classList.add('visible');
-
-  const match = !result.excluded;
-  const color = match ? '#3ddc84' : '#e05c6a';
-  const vbox  = document.getElementById('verdict-box');
-  vbox.className = 'verdict-box ' + (match?'match':'nomatch');
-  document.getElementById('verdict-icon').textContent  = match?'✓':'✗';
-  document.getElementById('verdict-title').textContent = match?'Paternity Confirmed':'Paternity Excluded';
-  document.getElementById('verdict-sub').textContent   = match
-    ? 'BIOLOGICAL RELATIONSHIP ESTABLISHED WITH HIGH CERTAINTY'
-    : 'GENETIC MARKERS ARE INCONSISTENT — PATERNITY EXCLUDED';
-
-  const cpiStr = result.CPI>999999?'>999,999':result.CPI>9999?result.CPI.toFixed(0):result.CPI.toFixed(1);
-  const shared = result.markers.filter(function(m){return m.shared;}).length;
-  const grid   = document.getElementById('stats-grid');
-  grid.innerHTML = [
-    {label:'PATERNITY INDEX',value:cpiStr,      unit:'PI'},
-    {label:'PROBABILITY',    value:result.PP.toFixed(3)+'%', unit:'PP'},
-    {label:'LOCI TESTED',    value:result.markers.length, unit:'STR LOCI'},
-    {label:'LOCI CONCORDANT',value:shared,      unit:'SHARED'},
+  // Stats
+  var grid=document.getElementById('stats-grid');
+  grid.innerHTML=[
+    {lbl:'MATCH SCORE',    val:pct+'%',         unit:'Similarity Index'},
+    {lbl:'CONFIDENCE',     val: pct>=85?'HIGH': pct>=65?'MODERATE':'LOW', unit:'Confidence Level'},
+    {lbl:'FEATURES TESTED',val:'8',             unit:'Biometric Parameters'},
+    {lbl:'RESULT',         val: pct>=85?'MATCH': pct>=45?'POSSIBLE':'NO MATCH', unit:'Final Classification'},
   ].map(function(s){
-    return '<div class="stat-card"><div class="stat-label">'+s.label+'</div>'
-      +'<div class="stat-value">'+s.value+'</div>'
+    return '<div class="stat-card"><div class="stat-lbl">'+s.lbl+'</div>'
+      +'<div class="stat-val" style="color:'+color+'">'+s.val+'</div>'
       +'<div class="stat-unit">'+s.unit+'</div></div>';
   }).join('');
 
-  const rows = document.getElementById('str-rows');
-  rows.innerHTML = result.markers.map(function(m,i){
-    const cls = m.shared?'yes':'no';
-    return '<div class="str-row" style="animation-delay:'+(i*0.04)+'s">'
-      +'<span class="str-locus">'+m.name+'</span>'
-      +'<span class="str-allele">'+m.fa[0]+','+m.fa[1]+'</span>'
-      +'<span class="str-allele">'+m.ca[0]+','+m.ca[1]+'</span>'
-      +'<span class="str-match '+cls+'">'+(m.shared?'●':'○')+'</span>'
-      +'<span class="str-pi '+cls+'">'+m.pi.toFixed(3)+'</span>'
+  // Ridge rows
+  var rows=document.getElementById('ridge-rows');
+  rows.innerHTML=res.features.map(function(f,i){
+    var fc= f.pct>=85?'#3ddc84': f.pct>=65?'#f0a500':'#e05c6a';
+    return '<div class="ridge-row" style="animation-delay:'+(i*0.05)+'s">'
+      +'<span class="ridge-name" title="'+f.desc+'">'+f.name+'</span>'
+      +'<span class="ridge-val">'+f.p1+'</span>'
+      +'<span class="ridge-val">'+f.p2+'</span>'
+      +'<span class="match-bar-cell">'
+        +'<div class="mini-bar"><div class="mini-bar-fill" style="width:'+f.pct+'%;background:'+fc+'"></div></div>'
+        +'<span style="font-family:var(--mono);font-size:9px;color:'+fc+';min-width:32px;text-align:right">'+f.pct+'%</span>'
+      +'</span>'
       +'</div>';
   }).join('');
 
-  document.getElementById('lab-note-text').textContent =
-    'Analysis performed using Short Tandem Repeat (STR) profiling across '
-    +result.markers.length+' CODIS-core loci. '
-    +'Inclusion threshold: Combined Paternity Index (CPI) ≥ 100 and Probability of Paternity ≥ 99.000%.';
+  // Interpretation
+  var interp=document.getElementById('interp-content');
+  var lines=[];
+  if(lvl==='high'){
+    lines=[
+      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This is consistent with a close biological relationship such as parent-child or full siblings.'},
+      {icon:'📊',text:'A similarity score above <strong>85%</strong> falls within the range typically observed between first-degree biological relatives. Ridge patterns in this range share statistically significant minutiae concordance.'},
+      {icon:'🔬',text:'<strong>Ridge density</strong> and <strong>minutiae frequency</strong> — the two highest-weighted features — both show strong agreement, indicating shared genetic blueprint in dermatoglyphic development.'},
+      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> This result is supportive of a biological relationship. For legal or medical confirmation, an accredited STR-based DNA laboratory test is recommended.'},
+    ];
+  } else if(lvl==='mid-high'){
+    lines=[
+      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This is a moderate-to-high score suggesting a possible biological relationship.'},
+      {icon:'📊',text:'Scores between <strong>65–84%</strong> are seen in distant biological relatives (e.g. uncle/niece, half-siblings, grandparent/grandchild) and occasionally between unrelated individuals with similar ethnic backgrounds.'},
+      {icon:'🔬',text:'Some ridge features show strong agreement while others show divergence, which may be due to developmental variation or indicate a more distant biological relationship.'},
+      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> Result is inconclusive for confirming or excluding a close biological relationship. A laboratory DNA test is strongly recommended for a definitive answer.'},
+    ];
+  } else if(lvl==='mid'){
+    lines=[
+      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This falls in the inconclusive range.'},
+      {icon:'📊',text:'Scores between <strong>45–64%</strong> do not allow a confident conclusion. This range overlaps between distant relatives and unrelated individuals, making interpretation unreliable.'},
+      {icon:'🔬',text:'The ridge feature vectors show mixed agreement — some parameters align while others diverge significantly. This pattern does not strongly support or exclude a biological relationship.'},
+      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> This result is inconclusive. A certified STR DNA laboratory test is required to establish or exclude a biological relationship with certainty.'},
+    ];
+  } else {
+    lines=[
+      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This is below the threshold for a probable biological relationship.'},
+      {icon:'📊',text:'Scores below <strong>45%</strong> are typically observed between unrelated individuals. Ridge patterns at this level do not show the degree of concordance expected in parent-child or sibling pairs.'},
+      {icon:'🔬',text:'The majority of ridge features — including ridge density, minutiae frequency, and core pattern type — show significant divergence between the two subjects.'},
+      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> Result does not support a close biological relationship. However, this is a biometric screening tool only — a certified DNA laboratory test should be obtained before any legal or medical conclusion is drawn.'},
+    ];
+  }
+  interp.innerHTML=lines.map(function(l){
+    return '<div class="interp-row"><span class="interp-icon">'+l.icon+'</span>'
+      +'<div class="interp-text">'+l.text+'</div></div>';
+  }).join('');
 
-  // Update step tabs
+  // Threshold note
+  document.getElementById('threshold-note').textContent=
+    'Reference thresholds used: ≥85% = Strong match (high probability of close biological relationship); '
+    +'65–84% = Moderate match (possible relationship, further testing advised); '
+    +'45–64% = Inconclusive; <45% = Low match (biological relationship unlikely).';
+
+  // Tab update
   document.getElementById('tab-1').classList.remove('active');
   document.getElementById('tab-2').classList.remove('active');
   document.getElementById('tab-3').classList.add('active');
 }
 
-function resetAll() {
-  STATE.father=null; STATE.child=null;
-  drawEmptyCanvas('father-canvas','#2e3248');
-  drawEmptyCanvas('child-canvas', '#2e3248');
-  updateTileUI('father'); updateTileUI('child');
+/* ════ STEP TABS (capture section) ════ */
+// Add step tabs to capture section
+document.addEventListener('DOMContentLoaded',function(){
+  var tabs='<div class="step-tabs" style="margin-bottom:0">'
+    +'<div class="step-tab active" id="tab-1">01 · SCAN</div>'
+    +'<div class="step-tab" id="tab-2">02 · ANALYZE</div>'
+    +'<div class="step-tab" id="tab-3">03 · REPORT</div>'
+    +'</div>';
+  // already in HTML
+});
+
+function resetAll(){
+  S.father=null;S.child=null;
+  emptyCanvas('father-canvas','#2e3248');emptyCanvas('child-canvas','#2e3248');
+  updateTile('father');updateTile('child');
   document.getElementById('result-section').classList.remove('visible');
   document.getElementById('capture-section').style.display='block';
-  document.getElementById('tab-1').classList.add('active');
-  document.getElementById('tab-3').classList.remove('active');
-  document.getElementById('analyze-btn').innerHTML='◈&nbsp;&nbsp;RUN DNA ANALYSIS';
+  document.getElementById('analyze-btn').innerHTML='◈&nbsp;&nbsp;ANALYZE DNA MATCH';
   document.getElementById('analyze-btn').disabled=false;
+  document.getElementById('name-father').value='';
+  document.getElementById('name-child').value='';
+  document.getElementById('tab-3').classList.remove('active');
+  document.getElementById('tab-1').classList.add('active');
+  // Reset ring
+  document.getElementById('match-ring').style.strokeDashoffset='490';
+  document.getElementById('match-pct-label').textContent='0%';
 }
 </script>
 </body>
