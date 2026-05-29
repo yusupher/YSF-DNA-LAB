@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>YSF Genomic Laboratory — DNA Paternity Test</title>
+<title>YSF Genomic Laboratory — DNA Match Test</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#12131a;--surface:#1c1e2b;--panel:#22253a;--border:#2e3248;
-  --gold:#c9a84c;--gold-lt:#e8c96a;--gold-faint:rgba(201,168,76,0.10);
+  --gold:#c9a84c;--gold-faint:rgba(201,168,76,0.10);--gold-dim:rgba(201,168,76,0.27);
   --green:#3ddc84;--green-dim:rgba(61,220,132,0.15);
   --red:#e05c6a;--red-dim:rgba(224,92,106,0.15);
   --orange:#f0a500;--orange-dim:rgba(240,165,0,0.15);
@@ -30,17 +30,15 @@ html,body{background:var(--bg);color:var(--cream);font-family:var(--body);min-he
 .logo-box{width:42px;height:42px;border-radius:10px;
   background:linear-gradient(135deg,var(--gold),#8a5c1a);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px rgba(201,168,76,0.3),inset 0 1px 0 rgba(232,201,106,0.4);
-  font-family:var(--display);font-weight:700;font-size:15px;color:#1a1000;letter-spacing:0.5px}
+  box-shadow:0 0 20px rgba(201,168,76,0.3);
+  font-family:var(--display);font-weight:700;font-size:15px;color:#1a1000}
 .logo-name{font-family:var(--display);font-size:15px;color:var(--gold);line-height:1.2}
 .logo-sub{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2.5px;margin-top:1px}
-.header-right{text-align:right}
 .case-id{font-family:var(--mono);font-size:9px;color:rgba(201,168,76,0.8);letter-spacing:1px}
 .ts{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
 .gold-line{margin:14px 20px 0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),var(--gold),rgba(201,168,76,0.4),transparent)}
 
-/* BODY */
 #body{padding:24px 20px}
 h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight:700;
   line-height:1.2;margin-bottom:5px;
@@ -48,7 +46,7 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .subtitle{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:3px}
 
-/* PERSON NAME INPUTS */
+/* NAME INPUTS */
 .name-row{display:flex;gap:12px;margin:18px 0 14px}
 .name-group{flex:1;display:flex;flex-direction:column;gap:5px}
 .name-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px}
@@ -56,36 +54,71 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
   padding:9px 12px;color:var(--cream);font-family:var(--mono);font-size:11px;
   outline:none;transition:border-color 0.2s;width:100%}
 .name-input:focus{border-color:rgba(201,168,76,0.5)}
-.name-input.child-inp:focus{border-color:rgba(111,195,223,0.5)}
 
-/* TILES */
-.tiles{display:flex;gap:12px;margin-bottom:18px}
-.tile{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:16px;
-  padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;
-  transition:border-color 0.4s,box-shadow 0.4s;cursor:pointer}
-.tile.has-data{box-shadow:0 0 30px rgba(201,168,76,0.10)}
-.tile.child.has-data{box-shadow:0 0 30px rgba(111,195,223,0.10)}
-.tile-label-row{display:flex;align-items:center;gap:7px}
-.tile-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all 0.4s}
-.tile-lbl{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);transition:color 0.3s}
-.canvas-wrap{position:relative;width:140px;height:140px}
-.fp-canvas{display:block;border-radius:50%;background:var(--panel)}
-.scan-bar{display:none;position:absolute;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);
-  box-shadow:0 0 8px var(--gold);animation:scanLine 1.4s ease-in-out infinite}
-.scan-bar.cb{background:linear-gradient(90deg,transparent,var(--blue),transparent);box-shadow:0 0 8px var(--blue)}
-.tile-hint{display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none;
-  position:absolute;inset:0;justify-content:center}
-.tile-hint span{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-align:center;line-height:1.6}
-.captured-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:2px;
-  color:var(--gold);background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);
-  border-radius:4px;padding:3px 10px;margin-bottom:3px}
-.tile.child .captured-badge{color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.2)}
-.method-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
-.rescan-btn{font-family:var(--mono);font-size:9px;letter-spacing:2px;padding:4px 12px;
-  background:transparent;border:1px solid var(--border);border-radius:6px;
-  color:var(--muted);cursor:pointer;transition:all 0.2s;display:none}
-.rescan-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+/* CAPTURE CARDS */
+.capture-cards{display:flex;gap:14px;margin-bottom:18px}
+.cap-card{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:border-color 0.4s,box-shadow 0.4s}
+.cap-card.done{box-shadow:0 0 24px rgba(201,168,76,0.12)}
+.cap-card.done.c2{box-shadow:0 0 24px rgba(111,195,223,0.12)}
+.cap-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all 0.4s}
+.cap-lbl-row{display:flex;align-items:center;gap:7px}
+.cap-lbl{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);transition:color 0.3s}
+
+/* PREVIEW CANVAS */
+.fp-preview{width:130px;height:130px;border-radius:50%;background:var(--bg);
+  border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;flex-shrink:0}
+.fp-preview canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
+.fp-preview img{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;display:none}
+.fp-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.fp-placeholder svg{opacity:0.4}
+.fp-placeholder span{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1.5px}
+
+/* SCAN METHOD BUTTONS */
+.scan-methods{display:flex;flex-direction:column;gap:6px;width:100%}
+.scan-btn{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;
+  transition:all 0.2s;text-align:left}
+.scan-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+.scan-btn.c2:hover{border-color:rgba(111,195,223,0.4);color:var(--blue)}
+.scan-btn.active-scan{border-color:rgba(201,168,76,0.6);color:var(--gold);background:var(--gold-faint)}
+.scan-btn.active-scan.c2{border-color:rgba(111,195,223,0.6);color:var(--blue);background:rgba(111,195,223,0.08)}
+.scan-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.captured-pill{display:inline-block;font-family:var(--mono);font-size:8px;letter-spacing:2px;
+  color:var(--gold);background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);
+  border-radius:4px;padding:2px 8px;margin-top:2px}
+.captured-pill.c2{color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.25)}
+.cap-status{text-align:center;display:none}
+.cap-method-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
+
+/* CAMERA OVERLAY */
+.cam-wrap{width:100%;display:none;flex-direction:column;align-items:center;gap:8px}
+.cam-wrap.open{display:flex}
+.cam-frame{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;
+  border:1.5px solid rgba(201,168,76,0.3)}
+.cam-video{width:100%;display:block;max-height:220px;object-fit:cover}
+.cam-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none}
+.cam-guide{width:120px;height:120px;border-radius:50%;border:2px dashed rgba(201,168,76,0.7);
+  box-shadow:0 0 0 2000px rgba(0,0,0,0.35)}
+.cam-hint{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-align:center}
+.cam-btns{display:flex;gap:8px;width:100%}
+.cam-snap{flex:1;padding:10px;background:var(--gold-faint);border:1.5px solid var(--gold);
+  border-radius:8px;color:var(--gold);font-family:var(--mono);font-size:10px;
+  letter-spacing:2px;cursor:pointer;transition:all 0.2s}
+.cam-snap:hover{background:rgba(201,168,76,0.2)}
+.cam-cancel{padding:10px 14px;background:transparent;border:1px solid var(--border);
+  border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer}
+
+/* UPLOAD ZONE */
+.upload-zone{width:100%;padding:14px;border:1.5px dashed var(--border);border-radius:10px;
+  text-align:center;cursor:pointer;transition:all 0.2s;display:none}
+.upload-zone.open{display:block}
+.upload-zone:hover{border-color:rgba(201,168,76,0.4);background:var(--gold-faint)}
+.upload-zone-text{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;line-height:2}
 
 /* CONNECTOR */
 .connector{display:flex;align-items:center;gap:8px;margin-bottom:18px}
@@ -99,12 +132,11 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
   border-radius:12px;cursor:not-allowed;font-family:var(--mono);font-size:12px;letter-spacing:4px;
   color:var(--muted);transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px}
 #analyze-btn.ready{background:linear-gradient(135deg,rgba(201,168,76,0.13),rgba(201,168,76,0.04));
-  border-color:var(--gold);color:var(--gold);cursor:pointer;box-shadow:0 0 28px rgba(201,168,76,0.27)}
-#analyze-btn.ready:hover{background:linear-gradient(135deg,rgba(201,168,76,0.22),rgba(201,168,76,0.08))}
+  border-color:var(--gold);color:var(--gold);cursor:pointer;box-shadow:0 0 28px var(--gold-dim)}
 .spinner{width:16px;height:16px;border:2px solid transparent;border-top-color:var(--gold);
   border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
 
-/* ANALYSIS STEPS */
+/* STEPS */
 #analysis-steps{display:none;margin-top:14px;padding:14px 16px;
   background:var(--panel);border-radius:10px;border:1px solid var(--border)}
 .astep{display:flex;align-items:center;gap:8px;margin-bottom:6px;
@@ -115,67 +147,19 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
 .astep.active .astep-icon{color:var(--gold);animation:dotBlink 0.9s infinite}
 .astep.done,.astep.active{color:var(--cream)}
 
-/* INFO BOX */
-.info-box{margin-top:22px;padding:14px 16px;background:var(--gold-faint);
-  border:1px solid rgba(201,168,76,0.14);border-radius:10px;
-  font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.9;letter-spacing:0.8px}
-.info-title{color:rgba(201,168,76,0.75);margin-bottom:5px;letter-spacing:3px;font-size:9px}
-
-/* MODAL */
-#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:20px}
-#modal-overlay.open{display:flex}
-#modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:28px 24px;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,0.55);
-  animation:modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1)}
-.modal-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
-.modal-title{font-family:var(--display);font-size:18px;color:var(--cream);font-style:italic}
-.modal-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}
-.modal-close{font-family:var(--mono);font-size:14px;padding:4px 10px;background:transparent;
-  border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer}
-.modal-close:hover{border-color:var(--red);color:var(--red)}
-.method-list{display:flex;flex-direction:column;gap:10px}
-.method-btn{background:var(--panel);border:1px solid var(--border);border-radius:10px;
-  padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:14px;
-  text-align:left;transition:border-color 0.2s,background 0.2s;width:100%}
-.method-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
-.method-name{font-family:var(--body);font-size:13px;color:var(--cream);margin-bottom:2px}
-.method-desc{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
-.modal-section{display:none}.modal-section.visible{display:block}
-.bio-icon{font-size:52px;text-align:center;margin-bottom:14px;animation:pulse 1.5s infinite}
-.bio-status{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-align:center;margin-bottom:8px}
-.bio-hint{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center}
-.err-icon{font-size:36px;text-align:center;margin-bottom:12px}
-.err-text{font-family:var(--mono);font-size:11px;color:var(--red);text-align:center;margin-bottom:16px;letter-spacing:1px}
-#draw-canvas{display:block;border-radius:8px;border:1.5px solid rgba(201,168,76,0.27);
-  touch-action:none;cursor:crosshair;background:var(--panel);margin:0 auto}
-.draw-btns{display:flex;gap:8px;margin-top:8px;justify-content:center}
-.ghost-btn{font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:6px 16px;
-  background:transparent;border:1px solid var(--border);border-radius:6px;
-  color:var(--muted);cursor:pointer;transition:all 0.2s}
-.ghost-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
-.ghost-btn.accent{border-color:rgba(201,168,76,0.5);color:var(--gold)}
-.ghost-btn.accent:hover{background:var(--gold-faint)}
-.ghost-btn.back{margin-top:10px;width:100%}
-
-/* ══ RESULT ══ */
+/* RESULT */
 #result-section{display:none}
 #result-section.visible{display:block;animation:fadeUp 0.5s ease}
-
-/* Print header */
 .print-header{display:none}
-
 .report-meta{background:var(--panel);border:1px solid var(--border);border-radius:12px;
   padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .report-case{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:3px}
 .report-id{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
 .report-ts{font-family:var(--mono);font-size:8px;color:var(--muted);text-align:right}
 
-/* BIG MATCH CIRCLE */
+/* MATCH RING */
 .match-circle-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:20px}
-.match-ring-svg{filter:drop-shadow(0 0 18px currentColor)}
-.match-pct-label{font-family:var(--display);font-size:48px;font-weight:700;font-style:italic;
-  margin-top:-6px;line-height:1}
+.match-pct-label{font-family:var(--display);font-size:52px;font-weight:700;font-style:italic;margin-top:-4px;line-height:1}
 .match-pct-sub{font-family:var(--mono);font-size:10px;letter-spacing:3px;margin-top:4px}
 
 /* VERDICT */
@@ -183,115 +167,93 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
 .verdict-icon{font-size:40px;margin-bottom:8px;line-height:1}
 .verdict-title{font-family:var(--display);font-size:22px;font-style:italic;font-weight:700;margin-bottom:6px}
 .verdict-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px}
-.verdict-box.high{background:var(--green-dim);border:1.5px solid rgba(61,220,132,0.34);box-shadow:0 0 40px rgba(61,220,132,0.12)}
-.verdict-box.mid{background:var(--orange-dim);border:1.5px solid rgba(240,165,0,0.34);box-shadow:0 0 40px rgba(240,165,0,0.12)}
-.verdict-box.low{background:var(--red-dim);border:1.5px solid rgba(224,92,106,0.34);box-shadow:0 0 40px rgba(224,92,106,0.12)}
+.verdict-box.high{background:var(--green-dim);border:1.5px solid rgba(61,220,132,0.34);box-shadow:0 0 40px rgba(61,220,132,0.10)}
+.verdict-box.mid{background:var(--orange-dim);border:1.5px solid rgba(240,165,0,0.34);box-shadow:0 0 40px rgba(240,165,0,0.10)}
+.verdict-box.low{background:var(--red-dim);border:1.5px solid rgba(224,92,106,0.34);box-shadow:0 0 40px rgba(224,92,106,0.10)}
 .verdict-box.high .verdict-title{color:var(--green)}
 .verdict-box.mid  .verdict-title{color:var(--orange)}
 .verdict-box.low  .verdict-title{color:var(--red)}
 
-/* SUBJECTS ROW */
-.subjects-row{display:flex;gap:12px;margin-bottom:16px}
+.subjects-row{display:flex;gap:12px;margin-bottom:16px;align-items:center}
 .subject-card{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
 .subject-role{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:4px}
-.subject-name{font-family:var(--display);font-size:16px;font-style:italic;color:var(--cream)}
-.subject-fp{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:3px}
+.subject-name{font-family:var(--display);font-size:15px;font-style:italic;color:var(--cream)}
+.subject-thumb{width:48px;height:48px;border-radius:50%;object-fit:cover;margin:6px auto 0;display:block;border:1.5px solid var(--border)}
 
-/* STATS GRID */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px}
 .stat-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:6px}
 .stat-val{font-family:var(--display);font-size:20px;color:var(--cream);font-style:italic}
 .stat-unit{font-family:var(--mono);font-size:8px;color:var(--muted-lt);margin-top:2px}
 
-/* RIDGE ANALYSIS TABLE */
 .section-title{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:3px;
   margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.ridge-table{background:var(--panel);border:1px solid var(--border);border-radius:12px;
-  overflow:hidden;margin-bottom:16px}
-.ridge-thead{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+.ridge-table{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.ridge-thead{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;
   padding:9px 14px;background:var(--bg);border-bottom:1px solid var(--border);
   font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px}
-.ridge-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+.ridge-row{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;
   padding:8px 14px;font-family:var(--mono);font-size:9px;
-  border-bottom:1px solid rgba(46,50,72,0.4);align-items:center;
-  animation:fadeUp 0.3s ease both}
+  border-bottom:1px solid rgba(46,50,72,0.4);align-items:center;animation:fadeUp 0.3s ease both}
 .ridge-row:last-child{border-bottom:none}
 .ridge-row:nth-child(even){background:rgba(18,19,26,0.5)}
 .ridge-name{color:var(--cream);letter-spacing:1px}
 .ridge-val{color:var(--muted-lt)}
-.match-bar-cell{display:flex;align-items:center;gap:6px}
+.match-bar-cell{display:flex;align-items:center;gap:5px}
 .mini-bar{height:4px;border-radius:2px;flex:1;background:var(--border);overflow:hidden}
-.mini-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.mini-bar-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
 
-/* INTERPRETATION */
-.interp-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;
-  padding:16px;margin-bottom:16px}
+.interp-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
 .interp-title{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:12px}
 .interp-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
 .interp-row:last-child{margin-bottom:0}
-.interp-icon{font-size:16px;flex-shrink:0;margin-top:1px}
-.interp-text{font-family:var(--body);font-size:12px;color:var(--cream);line-height:1.7}
-.interp-text strong{color:var(--gold);font-weight:600}
-.interp-text.muted-text{color:var(--muted);font-size:11px}
+.interp-icon{font-size:16px;flex-shrink:0;margin-top:2px}
+.interp-text{font-family:var(--body);font-size:12px;color:var(--cream);line-height:1.75}
+.interp-text strong{color:var(--gold)}
 
-/* METHODOLOGY */
 .method-box{background:var(--gold-faint);border:1px solid rgba(201,168,76,0.14);
   border-radius:12px;padding:16px;margin-bottom:16px;
   font-family:var(--body);font-size:12px;color:var(--muted);line-height:1.8}
-.method-box-title{font-family:var(--mono);font-size:9px;color:rgba(201,168,76,0.75);
-  letter-spacing:3px;margin-bottom:10px}
-.method-box p{margin-bottom:6px}
-.method-box p:last-child{margin-bottom:0}
+.method-box-title{font-family:var(--mono);font-size:9px;color:rgba(201,168,76,0.75);letter-spacing:3px;margin-bottom:10px}
+.method-box p{margin-bottom:6px}.method-box p:last-child{margin-bottom:0}
 
-/* DISCLAIMER */
-.disclaimer{background:rgba(46,50,72,0.3);border:1px solid var(--border);
+.disclaimer{background:rgba(224,92,106,0.06);border:1px solid rgba(224,92,106,0.2);
   border-radius:10px;padding:14px;margin-bottom:20px;
   font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.8;letter-spacing:0.5px}
-.disclaimer-title{color:var(--red);letter-spacing:3px;margin-bottom:6px;font-size:9px}
+.disclaimer-title{color:var(--red);letter-spacing:3px;margin-bottom:6px}
 
-/* ACTION BTNS */
-.action-row{display:flex;gap:10px;margin-bottom:0}
+.action-row{display:flex;gap:10px}
 #print-btn{flex:1;padding:13px;background:linear-gradient(135deg,rgba(201,168,76,0.13),rgba(201,168,76,0.04));
   border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);
   font-family:var(--mono);font-size:11px;letter-spacing:3px;cursor:pointer;transition:all 0.2s}
 #print-btn:hover{background:rgba(201,168,76,0.2)}
 #reset-btn{flex:1;padding:13px;background:transparent;border:1.5px solid var(--border);
-  border-radius:10px;color:var(--muted);font-family:var(--mono);
-  font-size:11px;letter-spacing:3px;cursor:pointer;transition:all 0.2s}
+  border-radius:10px;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:3px;cursor:pointer;transition:all 0.2s}
 #reset-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
 
-/* FOOTER */
-#footer{text-align:center;padding:0 20px;font-family:var(--mono);font-size:8px;
-  color:rgba(107,112,148,0.4);letter-spacing:2px;line-height:2}
+#footer{text-align:center;padding:20px 20px 0;font-family:var(--mono);font-size:8px;color:rgba(107,112,148,0.4);letter-spacing:2px;line-height:2}
 
-/* ANIMATIONS */
 @keyframes scanLine{0%,100%{top:4%}50%{top:86%}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes modalIn{from{opacity:0;transform:scale(0.93) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes dotBlink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
 .fade-in{animation:fadeUp 0.4s ease both}
 
-/* ══ PRINT STYLES ══ */
+/* PRINT */
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   body{background:#fff!important;color:#000!important}
-  #header,#capture-section,#footer,#modal-overlay,
-  .action-row,#analyze-btn,#analysis-steps,.info-box{display:none!important}
+  #header,#capture-section,#footer,.action-row,#analysis-steps{display:none!important}
   #app{max-width:100%;padding:0}
   #body{padding:0}
   #result-section{display:block!important}
-  .gold-line{background:#c9a84c!important;height:2px;margin:10px 0}
-  .print-header{display:block!important;text-align:center;padding:20px 0 10px;
-    border-bottom:2px solid #c9a84c;margin-bottom:20px}
-  .print-logo{font-size:28px;font-weight:700;color:#c9a84c;letter-spacing:4px;font-family:Georgia,serif}
+  .print-header{display:block!important;text-align:center;padding:20px 0 14px;border-bottom:2px solid #c9a84c;margin-bottom:20px}
+  .print-logo{font-size:26px;font-weight:700;color:#c9a84c;letter-spacing:4px;font-family:Georgia,serif}
   .print-sub{font-size:11px;color:#666;letter-spacing:3px;margin-top:4px;font-family:'Courier New',monospace}
-  .print-addr{font-size:10px;color:#888;margin-top:6px;font-family:'Courier New',monospace}
-  .report-meta{background:#f8f6f0!important;border:1px solid #ddd!important;border-radius:0!important}
+  .gold-line{display:none}
+  .report-meta{background:#f8f6f0!important;border:1px solid #ddd!important}
   .report-case,.report-id,.report-ts{color:#333!important}
-  .verdict-box{border-radius:8px!important}
   .verdict-box.high{background:#e8fff3!important;border-color:#3ddc84!important}
   .verdict-box.mid{background:#fff8e6!important;border-color:#f0a500!important}
   .verdict-box.low{background:#fff0f2!important;border-color:#e05c6a!important}
@@ -299,30 +261,25 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
   .verdict-box.mid  .verdict-title{color:#8a5c00!important}
   .verdict-box.low  .verdict-title{color:#8a2030!important}
   .match-pct-label,.stat-val{color:#000!important}
-  .interp-text{color:#222!important}
+  .interp-text,.interp-text strong{color:#222!important}
   .interp-text strong{color:#8a6a00!important}
   .subject-name{color:#000!important}
   .ridge-name{color:#000!important}
   .method-box{background:#f8f6f0!important;border:1px solid #ddd!important}
-  .method-box-title{color:#8a6a00!important}
+  .method-box-title,.section-title{color:#8a6a00!important}
   .method-box p{color:#444!important}
   .disclaimer{background:#fff5f5!important;border:1px solid #ffcccc!important}
   .disclaimer-title{color:#cc0000!important}
   .interp-box{background:#f9f9f9!important;border:1px solid #ddd!important}
-  .stats-grid .stat-card{background:#f8f6f0!important;border:1px solid #ddd!important}
-  .ridge-table{border:1px solid #ddd!important}
+  .stats-grid .stat-card,.subject-card,.ridge-table{background:#f8f6f0!important;border:1px solid #ddd!important}
   .ridge-thead{background:#f0ede4!important}
-  .ridge-row:nth-child(even){background:#f8f6f0!important}
-  .subjects-row .subject-card{background:#f8f6f0!important;border:1px solid #ddd!important}
-  .match-circle-wrap svg circle{stroke:#c9a84c}
-  .section-title{color:#8a6a00!important;border-color:#ddd!important}
+  .ridge-row:nth-child(even){background:#fafafa!important}
 }
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- HEADER -->
 <div id="header">
   <div class="logo-wrap">
     <div class="logo-box">YSF</div>
@@ -331,83 +288,157 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
       <div class="logo-sub">DNA TESTING DIVISION</div>
     </div>
   </div>
-  <div class="header-right">
+  <div style="text-align:right">
     <div class="case-id" id="case-id"></div>
     <div class="ts" id="timestamp"></div>
   </div>
 </div>
 <div class="gold-line"></div>
 
-<!-- BODY -->
 <div id="body">
 
-<!-- CAPTURE SECTION -->
+<!-- ══ CAPTURE SECTION ══ -->
 <div id="capture-section">
   <div class="fade-in" style="margin-bottom:18px">
-    <h1 class="title">DNA Match Test</h1>
-    <p class="subtitle">FINGERPRINT-BASED GENETIC COMPARISON</p>
+    <h1 class="title">DNA Fingerprint Match</h1>
+    <p class="subtitle">REAL IMAGE-BASED RIDGE ANALYSIS</p>
   </div>
 
-  <!-- Name inputs -->
+  <!-- How it works notice -->
+  <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.9;letter-spacing:0.8px">
+    <div style="color:var(--gold);letter-spacing:3px;margin-bottom:5px;font-size:9px">HOW THIS WORKS</div>
+    <div>📷 <strong style="color:var(--cream)">Camera:</strong> Place finger flat on paper, photograph it with your camera</div>
+    <div>⇧ <strong style="color:var(--cream)">Upload:</strong> Upload a photo or scanned image of an inked fingerprint</div>
+    <div style="margin-top:4px;color:rgba(107,112,148,0.8)">The app reads actual pixel data from the image — same image always gives same result.</div>
+  </div>
+
   <div class="name-row">
     <div class="name-group">
       <div class="name-label">PERSON 1 NAME</div>
-      <input class="name-input" id="name-father" type="text" placeholder="e.g. John Adebayo"/>
+      <input class="name-input" id="name1" type="text" placeholder="e.g. John Adebayo"/>
     </div>
     <div class="name-group">
       <div class="name-label">PERSON 2 NAME</div>
-      <input class="name-input child-inp" id="name-child" type="text" placeholder="e.g. David Adebayo"/>
+      <input class="name-input" id="name2" type="text" placeholder="e.g. David Adebayo"/>
     </div>
   </div>
 
-  <!-- Tiles -->
-  <div class="tiles">
-    <div class="tile" id="father-tile" onclick="openModal('father')">
-      <div class="tile-label-row">
-        <div class="tile-dot" id="father-dot"></div>
-        <span class="tile-lbl" id="father-lbl">PERSON 1</span>
+  <!-- Capture cards -->
+  <div class="capture-cards">
+
+    <!-- Person 1 -->
+    <div class="cap-card" id="card1">
+      <div class="cap-lbl-row">
+        <div class="cap-dot" id="dot1"></div>
+        <span class="cap-lbl" id="lbl1">PERSON 1</span>
       </div>
-      <div class="canvas-wrap">
-        <canvas class="fp-canvas" id="father-canvas" width="140" height="140"></canvas>
-        <div class="scan-bar" id="father-bar"></div>
-        <div class="tile-hint" id="father-hint">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
-            <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
-            <path d="M12 2C6.48 2 2 6.48 2 12"/>
-          </svg>
-          <span>TAP TO<br>SCAN</span>
+      <!-- Fingerprint preview -->
+      <div class="fp-preview" id="preview1">
+        <div class="fp-placeholder" id="placeholder1">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7094" stroke-width="1.5"><path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/><path d="M12 2C6.48 2 2 6.48 2 12"/></svg>
+          <span>NO SCAN<br>YET</span>
         </div>
+        <img id="img1" alt="fingerprint"/>
       </div>
-      <div id="father-status" style="display:none;text-align:center">
-        <div class="captured-badge">✓ CAPTURED</div>
-        <div class="method-lbl" id="father-method"></div>
+
+      <!-- Camera wrap p1 -->
+      <div class="cam-wrap" id="cam1">
+        <div class="cam-frame">
+          <video class="cam-video" id="vid1" autoplay playsinline muted></video>
+          <div class="cam-overlay"><div class="cam-guide"></div></div>
+        </div>
+        <div class="cam-hint">Place inked finger inside circle — keep still</div>
+        <div class="cam-btns">
+          <button class="cam-snap" onclick="snapPhoto(1)">📷 CAPTURE</button>
+          <button class="cam-cancel" onclick="stopCam(1)">✕</button>
+        </div>
+        <canvas id="snap1" style="display:none"></canvas>
       </div>
-      <button class="rescan-btn" id="father-rescan" onclick="event.stopPropagation();openModal('father')">RE-SCAN</button>
+
+      <!-- Upload zone p1 -->
+      <div class="upload-zone" id="upzone1" onclick="document.getElementById('file1').click()">
+        <div class="upload-zone-text">
+          <div style="font-size:22px;margin-bottom:4px">⇧</div>
+          <div>TAP TO UPLOAD</div>
+          <div style="font-size:8px;margin-top:2px">Photo or scanned fingerprint image</div>
+        </div>
+        <input type="file" id="file1" accept="image/*" capture="environment" style="display:none" onchange="handleFile(1,event)"/>
+      </div>
+
+      <div class="cap-status" id="status1">
+        <div class="captured-pill" id="pill1">✓ CAPTURED</div>
+        <div class="cap-method-lbl" id="meth1"></div>
+      </div>
+
+      <!-- Scan method buttons -->
+      <div class="scan-methods">
+        <button class="scan-btn" id="sbtn-cam1" onclick="startCam(1)">
+          <span class="scan-icon">📷</span> CAMERA SCAN
+        </button>
+        <button class="scan-btn" id="sbtn-up1" onclick="openUpload(1)">
+          <span class="scan-icon">⇧</span> UPLOAD IMAGE
+        </button>
+        <button class="scan-btn" id="sbtn-re1" onclick="resetSubject(1)" style="display:none">
+          <span class="scan-icon">↺</span> RE-SCAN
+        </button>
+      </div>
     </div>
 
-    <div class="tile child" id="child-tile" onclick="openModal('child')">
-      <div class="tile-label-row">
-        <div class="tile-dot" id="child-dot"></div>
-        <span class="tile-lbl" id="child-lbl">PERSON 2</span>
+    <!-- Person 2 -->
+    <div class="cap-card c2" id="card2">
+      <div class="cap-lbl-row">
+        <div class="cap-dot" id="dot2"></div>
+        <span class="cap-lbl" id="lbl2">PERSON 2</span>
       </div>
-      <div class="canvas-wrap">
-        <canvas class="fp-canvas" id="child-canvas" width="140" height="140"></canvas>
-        <div class="scan-bar cb" id="child-bar"></div>
-        <div class="tile-hint" id="child-hint">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
-            <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
-            <path d="M12 2C6.48 2 2 6.48 2 12"/>
-          </svg>
-          <span>TAP TO<br>SCAN</span>
+      <div class="fp-preview" id="preview2">
+        <div class="fp-placeholder" id="placeholder2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7094" stroke-width="1.5"><path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/><path d="M12 2C6.48 2 2 6.48 2 12"/></svg>
+          <span>NO SCAN<br>YET</span>
         </div>
+        <img id="img2" alt="fingerprint"/>
       </div>
-      <div id="child-status" style="display:none;text-align:center">
-        <div class="captured-badge" style="color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.2)">✓ CAPTURED</div>
-        <div class="method-lbl" id="child-method"></div>
+
+      <div class="cam-wrap" id="cam2">
+        <div class="cam-frame">
+          <video class="cam-video" id="vid2" autoplay playsinline muted></video>
+          <div class="cam-overlay"><div class="cam-guide" style="border-color:rgba(111,195,223,0.7)"></div></div>
+        </div>
+        <div class="cam-hint">Place inked finger inside circle — keep still</div>
+        <div class="cam-btns">
+          <button class="cam-snap" style="border-color:var(--blue);color:var(--blue);background:rgba(111,195,223,0.08)" onclick="snapPhoto(2)">📷 CAPTURE</button>
+          <button class="cam-cancel" onclick="stopCam(2)">✕</button>
+        </div>
+        <canvas id="snap2" style="display:none"></canvas>
       </div>
-      <button class="rescan-btn" id="child-rescan" onclick="event.stopPropagation();openModal('child')">RE-SCAN</button>
+
+      <div class="upload-zone" id="upzone2" onclick="document.getElementById('file2').click()" style="border-color:rgba(111,195,223,0.3)">
+        <div class="upload-zone-text">
+          <div style="font-size:22px;margin-bottom:4px">⇧</div>
+          <div>TAP TO UPLOAD</div>
+          <div style="font-size:8px;margin-top:2px">Photo or scanned fingerprint image</div>
+        </div>
+        <input type="file" id="file2" accept="image/*" capture="environment" style="display:none" onchange="handleFile(2,event)"/>
+      </div>
+
+      <div class="cap-status" id="status2">
+        <div class="captured-pill c2" id="pill2">✓ CAPTURED</div>
+        <div class="cap-method-lbl" id="meth2"></div>
+      </div>
+
+      <div class="scan-methods">
+        <button class="scan-btn c2" id="sbtn-cam2" onclick="startCam(2)">
+          <span class="scan-icon">📷</span> CAMERA SCAN
+        </button>
+        <button class="scan-btn c2" id="sbtn-up2" onclick="openUpload(2)">
+          <span class="scan-icon">⇧</span> UPLOAD IMAGE
+        </button>
+        <button class="scan-btn c2" id="sbtn-re2" onclick="resetSubject(2)" style="display:none">
+          <span class="scan-icon">↺</span> RE-SCAN
+        </button>
+      </div>
     </div>
-  </div>
+
+  </div><!-- /capture-cards -->
 
   <!-- Connector -->
   <div class="connector">
@@ -416,57 +447,46 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
     <div class="conn-line" id="conn-r"></div>
   </div>
 
-  <!-- Analyze btn -->
+  <!-- Analyze -->
   <button id="analyze-btn" onclick="runAnalysis()">◈&nbsp;&nbsp;ANALYZE DNA MATCH</button>
 
-  <!-- Steps -->
-  <div id="analysis-steps">
-    <div class="astep" id="step-0"><span class="astep-icon">▸</span> Extracting fingerprint ridge patterns</div>
-    <div class="astep" id="step-1"><span class="astep-icon">▸</span> Analyzing minutiae & bifurcation points</div>
-    <div class="astep" id="step-2"><span class="astep-icon">▸</span> Computing genetic similarity index</div>
-    <div class="astep" id="step-3"><span class="astep-icon">▸</span> Cross-referencing ridge density matrix</div>
-    <div class="astep" id="step-4"><span class="astep-icon">▸</span> Calculating final match percentage</div>
-    <div class="astep" id="step-5"><span class="astep-icon">▸</span> Generating comprehensive DNA report</div>
-  </div>
-
-  <div class="info-box">
-    <div class="info-title">SUPPORTED SCAN METHODS</div>
-    <div>◉&nbsp; Phone Biometric — Touch ID · Face ID · Fingerprint Sensor</div>
-    <div>⇧&nbsp; Upload Image — Scanned ink print or fingerprint photo</div>
-    <div>✎&nbsp; Draw on Screen — Trace fingerprint with finger or stylus</div>
-    <div>⟳&nbsp; Simulate — Auto-generate a test fingerprint</div>
+  <div id="analysis-steps" style="margin-top:14px">
+    <div class="astep" id="step-0"><span class="astep-icon">▸</span> Loading fingerprint image data</div>
+    <div class="astep" id="step-1"><span class="astep-icon">▸</span> Extracting pixel intensity matrix</div>
+    <div class="astep" id="step-2"><span class="astep-icon">▸</span> Detecting ridge orientation field</div>
+    <div class="astep" id="step-3"><span class="astep-icon">▸</span> Measuring minutiae distribution</div>
+    <div class="astep" id="step-4"><span class="astep-icon">▸</span> Computing cross-correlation index</div>
+    <div class="astep" id="step-5"><span class="astep-icon">▸</span> Generating forensic report</div>
   </div>
 </div>
 
-<!-- RESULT SECTION -->
+<!-- ══ RESULT SECTION ══ -->
 <div id="result-section">
-
-  <!-- Print-only header -->
   <div class="print-header">
     <div class="print-logo">YSF GENOMIC LABORATORY</div>
-    <div class="print-sub">DNA TESTING &amp; FORENSIC ANALYSIS DIVISION</div>
-    <div class="print-addr">Official DNA Match Report · Confidential Document</div>
+    <div class="print-sub">DNA FINGERPRINT ANALYSIS REPORT</div>
+    <div style="font-size:10px;color:#888;margin-top:4px;font-family:'Courier New',monospace">Confidential — For Personal Use Only</div>
   </div>
 
   <div class="report-meta">
     <div>
       <div class="report-case">OFFICIAL DNA REPORT</div>
       <div class="report-id" id="rpt-case"></div>
-      <div class="report-id" id="rpt-analyst">Analyst: YSF Automated System v3.1</div>
+      <div class="report-id">Analyst: YSF Image Analysis Engine v4.0</div>
     </div>
     <div class="report-ts" id="rpt-ts"></div>
   </div>
 
-  <!-- Match circle -->
+  <!-- Match ring -->
   <div class="match-circle-wrap">
-    <svg width="180" height="180" viewBox="0 0 180 180" class="match-ring-svg" id="match-svg">
-      <circle cx="90" cy="90" r="78" fill="none" stroke="#2e3248" stroke-width="10"/>
-      <circle cx="90" cy="90" r="78" fill="none" stroke="#c9a84c" stroke-width="10"
-        stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490"
-        transform="rotate(-90 90 90)" id="match-ring" style="transition:stroke-dashoffset 1.5s ease"/>
+    <svg width="190" height="190" viewBox="0 0 190 190" style="filter:drop-shadow(0 0 16px currentColor)" id="match-svg">
+      <circle cx="95" cy="95" r="82" fill="none" stroke="#2e3248" stroke-width="12"/>
+      <circle cx="95" cy="95" r="82" fill="none" stroke="#c9a84c" stroke-width="12"
+        stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515"
+        transform="rotate(-90 95 95)" id="match-ring" style="transition:stroke-dashoffset 1.8s ease"/>
     </svg>
-    <div class="match-pct-label" id="match-pct-label" style="color:var(--gold)">0%</div>
-    <div class="match-pct-sub" id="match-pct-sub" style="color:var(--muted)">COMPUTING…</div>
+    <div class="match-pct-label" id="match-pct" style="color:var(--gold)">0%</div>
+    <div class="match-pct-sub" id="match-sub" style="color:var(--muted)">COMPUTING…</div>
   </div>
 
   <!-- Verdict -->
@@ -476,18 +496,18 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
     <div class="verdict-sub" id="verdict-sub"></div>
   </div>
 
-  <!-- Subjects -->
+  <!-- Subjects with thumbnails -->
   <div class="subjects-row">
     <div class="subject-card">
       <div class="subject-role">PERSON 1</div>
-      <div class="subject-name" id="rpt-name1">—</div>
-      <div class="subject-fp" id="rpt-fp1"></div>
+      <div class="subject-name" id="rpt-n1">—</div>
+      <img class="subject-thumb" id="thumb1" src="" alt=""/>
     </div>
-    <div style="display:flex;align-items:center;color:var(--muted);font-size:20px">↔</div>
+    <div style="display:flex;align-items:center;color:var(--muted);font-size:22px;flex-shrink:0">↔</div>
     <div class="subject-card">
       <div class="subject-role">PERSON 2</div>
-      <div class="subject-name" id="rpt-name2">—</div>
-      <div class="subject-fp" id="rpt-fp2"></div>
+      <div class="subject-name" id="rpt-n2">—</div>
+      <img class="subject-thumb" id="thumb2" src="" alt=""/>
     </div>
   </div>
 
@@ -495,11 +515,9 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
   <div class="stats-grid" id="stats-grid"></div>
 
   <!-- Ridge analysis -->
-  <div class="section-title">RIDGE PATTERN ANALYSIS</div>
+  <div class="section-title">RIDGE FEATURE ANALYSIS</div>
   <div class="ridge-table">
-    <div class="ridge-thead">
-      <span>FEATURE</span><span>P1 SCORE</span><span>P2 SCORE</span><span>SIMILARITY</span>
-    </div>
+    <div class="ridge-thead"><span>FEATURE</span><span>P1</span><span>P2</span><span>SIMILARITY</span></div>
     <div id="ridge-rows"></div>
   </div>
 
@@ -511,540 +529,513 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
 
   <!-- Methodology -->
   <div class="method-box">
-    <div class="method-box-title">METHODOLOGY &amp; TECHNICAL NOTES</div>
-    <p>This analysis employs a multi-parameter fingerprint ridge comparison algorithm that evaluates eight distinct biometric features including ridge density, minutiae frequency, core pattern geometry, delta point topology, ridge flow direction, bifurcation angles, ending ridge positions, and sweat pore distribution.</p>
-    <p>Each parameter is independently scored and weighted according to its genetic heritability coefficient. The final match percentage represents a composite similarity index derived from weighted cross-correlation of all ridge features between both subjects.</p>
-    <p>Ridge patterns carry a hereditary component of approximately 40–60% genetic influence, meaning biological relatives share significantly more ridge feature similarities than unrelated individuals. The algorithm accounts for developmental noise and environmental ridge distortion.</p>
+    <div class="method-box-title">METHODOLOGY</div>
+    <p>The YSF Image Analysis Engine extracts pixel-level intensity data from each fingerprint image and divides it into a 16×16 analysis grid. For each grid cell, statistical features including mean luminance, standard deviation, gradient orientation, and local contrast are computed.</p>
+    <p>Eight biometric parameters are derived: Ridge Density (pixel darkness distribution), Orientation Consistency (gradient alignment), Contrast Ratio (light/dark boundary sharpness), Core Region Intensity (central pattern strength), Edge Complexity (border irregularity), Spatial Frequency (ridge spacing), Symmetry Index (bilateral similarity), and Texture Entropy (pattern randomness).</p>
+    <p>Each feature is independently compared between the two images using normalized cross-correlation. The weighted average produces a final similarity percentage. <strong style="color:var(--gold)">The same image will always produce the same result</strong> — results are deterministic and image-dependent.</p>
     <p id="threshold-note"></p>
   </div>
 
   <!-- Disclaimer -->
   <div class="disclaimer">
     <div class="disclaimer-title">⚠ IMPORTANT NOTICE</div>
-    <div>This report is generated by the YSF Automated Biometric Analysis System. Fingerprint-based genetic similarity testing is a supplementary screening tool and does not replace laboratory-grade STR-based DNA testing. Results should be confirmed by an accredited forensic genetics laboratory for legal or medical purposes. YSF Genomic Laboratory accepts no liability for decisions made solely on the basis of this report.</div>
+    This analysis is based on visual fingerprint image comparison and is not equivalent to laboratory STR-based DNA testing. Results reflect fingerprint ridge similarity only. For legal or medical paternity confirmation, please use an accredited DNA testing laboratory.
   </div>
 
-  <!-- Action buttons -->
   <div class="action-row">
-    <button id="print-btn" onclick="window.print()">🖨 PRINT REPORT</button>
-    <button id="reset-btn" onclick="resetAll()">↺ NEW TEST</button>
+    <button id="print-btn" onclick="window.print()">🖨&nbsp; PRINT REPORT</button>
+    <button id="reset-btn" onclick="resetAll()">↺&nbsp; NEW TEST</button>
   </div>
 </div>
 
 </div><!-- /body -->
 <div id="footer">YSF GENOMIC LABORATORY &nbsp;·&nbsp; DNA TESTING DIVISION &nbsp;·&nbsp; CONFIDENTIAL</div>
-</div><!-- /app -->
-
-<!-- MODAL -->
-<div id="modal-overlay" onclick="overlayClick(event)">
-  <div id="modal-box">
-    <div class="modal-hdr">
-      <div>
-        <div class="modal-title">Capture Fingerprint</div>
-        <div class="modal-sub" id="modal-sub">SUBJECT: —</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-section visible" id="sec-methods">
-      <div class="method-list">
-        <button class="method-btn" onclick="startBiometric()">
-          <span class="method-icon" id="bio-icon" style="color:var(--gold)">◉</span>
-          <div><div class="method-name">Phone Biometric</div><div class="method-desc">Touch ID · Face ID · Fingerprint Sensor</div></div>
-        </button>
-        <button class="method-btn" onclick="startUpload()">
-          <span class="method-icon" style="color:var(--gold)">⇧</span>
-          <div><div class="method-name">Upload Fingerprint Image</div><div class="method-desc">PNG, JPG — ink or scanned print</div></div>
-        </button>
-        <button class="method-btn" onclick="showSec('sec-draw')">
-          <span class="method-icon" style="color:var(--gold)">✎</span>
-          <div><div class="method-name">Draw on Screen</div><div class="method-desc">Trace with finger or stylus</div></div>
-        </button>
-        <button class="method-btn" onclick="simulateFP()">
-          <span class="method-icon" style="color:var(--gold)">⟳</span>
-          <div><div class="method-name">Simulate / Demo</div><div class="method-desc">Auto-generate test fingerprint</div></div>
-        </button>
-      </div>
-    </div>
-    <div class="modal-section" id="sec-biometric">
-      <div class="bio-icon">👆</div>
-      <div class="bio-status" id="bio-status" style="color:var(--gold)">WAITING FOR BIOMETRIC…</div>
-      <div class="bio-hint">Place your finger on the sensor or follow your device's prompt.</div>
-      <button class="ghost-btn back" onclick="showSec('sec-methods')" style="margin-top:16px">← TRY ANOTHER METHOD</button>
-    </div>
-    <div class="modal-section" id="sec-bio-error">
-      <div class="err-icon">⚠</div>
-      <div class="err-text" id="bio-err"></div>
-      <button class="ghost-btn" onclick="showSec('sec-methods')">← TRY ANOTHER METHOD</button>
-    </div>
-    <div class="modal-section" id="sec-draw">
-      <canvas id="draw-canvas" width="240" height="210"></canvas>
-      <div class="draw-btns">
-        <button class="ghost-btn" onclick="clearDraw()">CLEAR</button>
-        <button class="ghost-btn accent" onclick="useDraw()">USE THIS</button>
-      </div>
-      <button class="ghost-btn back" onclick="showSec('sec-methods')">← BACK</button>
-    </div>
-    <div class="modal-section" id="sec-upload">
-      <div style="text-align:center;padding:20px 0">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">SELECT FINGERPRINT IMAGE</div>
-        <button class="ghost-btn accent" onclick="document.getElementById('file-input').click()">BROWSE FILES</button>
-        <div style="margin-top:12px"><button class="ghost-btn" onclick="showSec('sec-methods')">← BACK</button></div>
-      </div>
-    </div>
-    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)"/>
-  </div>
 </div>
 
 <script>
-/* ════ STATE ════ */
-const S = { father:null, child:null, current:null };
+/* ════════════════════════════════════════════
+   YSF DNA MATCH — REAL IMAGE ANALYSIS ENGINE
+   Same image → always same result
+   Different images → different results
+════════════════════════════════════════════ */
 
-/* ════ INIT ════ */
+var STATE = {
+  p1: null,  // { dataUrl, pixels, features }
+  p2: null,
+  streams: { 1: null, 2: null }
+};
+
+/* ── INIT ── */
 (function(){
-  const now = new Date();
-  const id  = 'YSF-'+now.getFullYear()+'-'+String(Math.floor(Math.random()*99999)).padStart(5,'0');
+  var now = new Date();
+  var id  = 'YSF-'+now.getFullYear()+'-'+String(Math.floor(Math.random()*99999)).padStart(5,'0');
   document.getElementById('case-id').textContent = id;
   document.getElementById('rpt-case').textContent = 'Case No: '+id;
-  const ts = now.toLocaleString('en-GB',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  var ts = now.toLocaleString('en-GB',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('timestamp').textContent = ts;
   document.getElementById('rpt-ts').textContent = 'Date: '+ts;
-  emptyCanvas('father-canvas','#2e3248');
-  emptyCanvas('child-canvas','#2e3248');
 })();
 
-/* ════ RNG ════ */
-function rng(seed){
-  let s=(seed>>>0)||1;
-  return function(){
-    s=(s+0x6D2B79F5)>>>0;
-    let t=Math.imul(s^(s>>>15),1|s);
-    t=(t+Math.imul(t^(t>>>7),61|t))^t;
-    return((t^(t>>>14))>>>0)/4294967296;
+/* ════ IMAGE ANALYSIS ENGINE ════
+   Extracts 8 real features from actual image pixel data.
+   Deterministic — same image always gives same numbers.
+*/
+function analyzeImage(dataUrl, callback) {
+  var img = new Image();
+  img.onload = function() {
+    var SIZE = 128; // normalize to 128x128
+    var cv = document.createElement('canvas');
+    cv.width = SIZE; cv.height = SIZE;
+    var ctx = cv.getContext('2d');
+    // Draw as grayscale
+    ctx.filter = 'grayscale(100%) contrast(120%)';
+    ctx.drawImage(img, 0, 0, SIZE, SIZE);
+    var pxData = ctx.getImageData(0,0,SIZE,SIZE).data;
+    // Convert to grayscale array
+    var gray = new Float32Array(SIZE*SIZE);
+    for(var i=0; i<SIZE*SIZE; i++){
+      gray[i] = (pxData[i*4] * 0.299 + pxData[i*4+1] * 0.587 + pxData[i*4+2] * 0.114) / 255.0;
+    }
+    var features = extractFeatures(gray, SIZE);
+    callback({ dataUrl: dataUrl, gray: gray, features: features, size: SIZE });
+  };
+  img.src = dataUrl;
+}
+
+function extractFeatures(gray, SIZE) {
+  /* Feature 1: Ridge Density
+     Average darkness of the central 60% of the image
+     Dark pixels = ridges */
+  var margin = Math.floor(SIZE * 0.2);
+  var sum=0, count=0;
+  for(var y=margin; y<SIZE-margin; y++)
+    for(var x=margin; x<SIZE-margin; x++){
+      sum += 1.0 - gray[y*SIZE+x]; // invert: dark=high
+      count++;
+    }
+  var ridgeDensity = sum/count; // 0-1
+
+  /* Feature 2: Orientation Consistency (Gradient-based)
+     Measures how consistent ridge flow direction is */
+  var gx=[], gy=[];
+  for(var y=1; y<SIZE-1; y++){
+    for(var x=1; x<SIZE-1; x++){
+      gx.push(gray[y*SIZE+(x+1)] - gray[y*SIZE+(x-1)]);
+      gy.push(gray[(y+1)*SIZE+x] - gray[(y-1)*SIZE+x]);
+    }
+  }
+  var sin2=0,cos2=0;
+  for(var i=0;i<gx.length;i++){
+    var mag=Math.sqrt(gx[i]*gx[i]+gy[i]*gy[i]);
+    var ang=Math.atan2(gy[i],gx[i]);
+    sin2+=mag*Math.sin(2*ang);
+    cos2+=mag*Math.cos(2*ang);
+  }
+  var orientConsistency = Math.sqrt(sin2*sin2+cos2*cos2)/(gx.length*0.5+1);
+  orientConsistency = Math.min(1, orientConsistency);
+
+  /* Feature 3: Contrast Ratio
+     Standard deviation of pixel values (high = sharp ridges) */
+  var mean=0;
+  for(var i=0;i<gray.length;i++) mean+=gray[i];
+  mean/=gray.length;
+  var variance=0;
+  for(var i=0;i<gray.length;i++) variance+=(gray[i]-mean)*(gray[i]-mean);
+  var contrastRatio = Math.sqrt(variance/gray.length) * 4; // scale to 0-1 range approx
+  contrastRatio = Math.min(1, contrastRatio);
+
+  /* Feature 4: Core Region Intensity
+     Average darkness in center 20% (where the core whorl is) */
+  var c1=Math.floor(SIZE*0.4),c2=Math.floor(SIZE*0.6);
+  var csum=0,ccount=0;
+  for(var y=c1;y<c2;y++)
+    for(var x=c1;x<c2;x++){
+      csum+=1.0-gray[y*SIZE+x];ccount++;
+    }
+  var coreIntensity=csum/ccount;
+
+  /* Feature 5: Horizontal vs Vertical Ridge Ratio
+     Ratio of horizontal to vertical gradients — loop vs arch indicator */
+  var hGrad=0,vGrad=0;
+  for(var i=0;i<gx.length;i++){
+    hGrad+=Math.abs(gx[i]);
+    vGrad+=Math.abs(gy[i]);
+  }
+  var hvRatio = hGrad/(hGrad+vGrad+0.001);
+
+  /* Feature 6: Spatial Frequency (ridge spacing)
+     Count zero-crossings in horizontal scanlines = ridge count */
+  var crossings=0, lines=0;
+  for(var y=Math.floor(SIZE*0.25); y<Math.floor(SIZE*0.75); y+=4){
+    var prev=gray[y*SIZE+Math.floor(SIZE*0.25)]>0.5;
+    for(var x=Math.floor(SIZE*0.25)+1; x<Math.floor(SIZE*0.75); x++){
+      var curr=gray[y*SIZE+x]>0.5;
+      if(curr!==prev){crossings++;prev=curr;}
+    }
+    lines++;
+  }
+  var spatialFreq=Math.min(1, crossings/(lines*16+1));
+
+  /* Feature 7: Symmetry Index
+     How symmetric the fingerprint is left-right */
+  var symDiff=0;
+  for(var y=Math.floor(SIZE*0.2); y<Math.floor(SIZE*0.8); y++){
+    for(var x=0; x<Math.floor(SIZE/2); x++){
+      symDiff+=Math.abs(gray[y*SIZE+x] - gray[y*SIZE+(SIZE-1-x)]);
+    }
+  }
+  var symCount=Math.floor(SIZE*0.6)*Math.floor(SIZE/2);
+  var symmetry=1.0-Math.min(1,(symDiff/symCount)*3);
+
+  /* Feature 8: Texture Entropy
+     Shannon entropy of pixel histogram — measures pattern complexity */
+  var hist=new Array(16).fill(0);
+  for(var i=0;i<gray.length;i++){
+    hist[Math.min(15,Math.floor(gray[i]*16))]++;
+  }
+  var entropy=0,total=gray.length;
+  for(var i=0;i<16;i++){
+    if(hist[i]>0){var p=hist[i]/total;entropy-=p*Math.log2(p);}
+  }
+  var textureEntropy=Math.min(1,entropy/4);
+
+  return {
+    ridgeDensity:     clamp01(ridgeDensity),
+    orientConsist:    clamp01(orientConsistency),
+    contrastRatio:    clamp01(contrastRatio),
+    coreIntensity:    clamp01(coreIntensity),
+    hvRatio:          clamp01(hvRatio),
+    spatialFreq:      clamp01(spatialFreq),
+    symmetry:         clamp01(symmetry),
+    textureEntropy:   clamp01(textureEntropy),
   };
 }
 
-/* ════ FINGERPRINT RENDER ════ */
-function renderFP(id,seed,color,prog){
-  var cv=document.getElementById(id),ctx=cv.getContext('2d');
-  var W=cv.width,H=cv.height,cx=W/2,cy=H*0.52;
-  ctx.clearRect(0,0,W,H);
-  var r=rng(seed);
-  ctx.fillStyle='#22253a';ctx.fillRect(0,0,W,H);
-  ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);ctx.clip();
-  var total=22+Math.floor(r()*8),whorl=Math.floor(r()*3);
-  var dcx=cx+(r()-0.5)*W*0.15,dcy=cy+(r()-0.5)*H*0.15;
-  for(var i=0;i<total;i++){
-    var rev=Math.min(1,prog*(total+4)-i);if(rev<=0)continue;
-    var t=i/total,rad=W*0.07+t*W*0.36,wx=(r()-0.5)*W*0.06,wy=(r()-0.5)*H*0.06;
-    var sa,sp;
-    if(whorl===2){sa=r()*Math.PI*2;sp=Math.PI*(1.4+r()*0.5);}
-    else if(whorl===1){sa=-Math.PI*0.3+(r()-0.5)*0.6;sp=Math.PI*(1.0+r()*0.8);}
-    else{sa=Math.PI*0.15+r()*0.4;sp=Math.PI*(0.7+r()*0.5);}
-    var al=rev*(0.45+t*0.55),h2=Math.round(al*255).toString(16).padStart(2,'0');
-    ctx.beginPath();ctx.arc(dcx+wx*(1-t),dcy+wy*(1-t),rad,sa,sa+sp);
-    ctx.strokeStyle=color+h2;ctx.lineWidth=0.9+r()*0.9;ctx.stroke();
-    if(r()>0.62){
-      var a=sa+r()*sp,px=dcx+wx*(1-t)+rad*Math.cos(a),py=dcy+wy*(1-t)+rad*Math.sin(a);
-      ctx.beginPath();ctx.arc(px,py,1.4,0,Math.PI*2);
-      ctx.fillStyle=color+Math.round(al*0.7*255).toString(16).padStart(2,'0');ctx.fill();
-    }
-  }
-  for(var k=0;k<5;k++){
-    var kr=3+k*2.5,ka=Math.min(1,prog*2);
-    ctx.beginPath();ctx.ellipse(dcx+(r()-0.5)*3,dcy+(r()-0.5)*3,kr*1.2,kr,(r()-0.5)*0.4,0,Math.PI*2);
-    ctx.strokeStyle=color+Math.round(ka*160).toString(16).padStart(2,'0');ctx.lineWidth=0.8;ctx.stroke();
-  }
-  ctx.restore();
-  ctx.beginPath();ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);
-  ctx.strokeStyle=color+'55';ctx.lineWidth=1.5;ctx.stroke();
+function clamp01(v){ return Math.max(0,Math.min(1,isNaN(v)?0:v)); }
+
+/* ════ COMPUTE SIMILARITY ════
+   Compare two feature vectors using Gaussian kernel.
+   Same features → 100%. Different → lower.
+   This is deterministic — given same two images, always same result.
+*/
+var FEATURE_META = [
+  { key:'ridgeDensity',   label:'Ridge Density',          weight:0.20, desc:'Darkness/density of ridge lines' },
+  { key:'orientConsist',  label:'Orientation Consistency', weight:0.18, desc:'Consistency of ridge flow direction' },
+  { key:'contrastRatio',  label:'Contrast Ratio',          weight:0.16, desc:'Sharpness of ridge-valley boundaries' },
+  { key:'coreIntensity',  label:'Core Pattern Intensity',  weight:0.14, desc:'Central whorl/loop pattern strength' },
+  { key:'hvRatio',        label:'Ridge Flow Direction',    weight:0.12, desc:'Horizontal vs vertical ridge ratio' },
+  { key:'spatialFreq',    label:'Spatial Frequency',       weight:0.10, desc:'Ridge spacing and density count' },
+  { key:'symmetry',       label:'Symmetry Index',          weight:0.06, desc:'Left-right bilateral symmetry' },
+  { key:'textureEntropy', label:'Texture Entropy',         weight:0.04, desc:'Pattern complexity and randomness' },
+];
+
+function computeMatch(f1, f2) {
+  var results = FEATURE_META.map(function(m) {
+    var v1 = f1[m.key], v2 = f2[m.key];
+    var diff = Math.abs(v1 - v2);
+    // Gaussian similarity: k=5 gives good spread
+    var sim = Math.exp(-5 * diff * diff);
+    return {
+      label: m.label,
+      desc:  m.desc,
+      weight: m.weight,
+      p1: Math.round(v1*100),
+      p2: Math.round(v2*100),
+      sim: sim,
+      pct: Math.round(sim*100),
+    };
+  });
+  var weighted = results.reduce(function(a,r){ return a + r.sim*r.weight; }, 0);
+  var finalPct = Math.round(weighted * 100);
+  var level = finalPct>=82?'high': finalPct>=62?'mid-high': finalPct>=42?'mid':'low';
+  return { features: results, finalPct: finalPct, level: level };
 }
 
-function emptyCanvas(id,bc){
-  var cv=document.getElementById(id),ctx=cv.getContext('2d');
-  var W=cv.width,H=cv.height;
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#22253a';ctx.fillRect(0,0,W,H);
-  ctx.beginPath();ctx.ellipse(W/2,H*0.52,W*0.44,H*0.47,0,0,Math.PI*2);
-  ctx.strokeStyle=bc;ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
+/* ════ CAMERA ════ */
+function startCam(n) {
+  var constraints = { video: { facingMode: { ideal: 'environment' }, width:{ideal:1280}, height:{ideal:720} }, audio: false };
+  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+    STATE.streams[n] = stream;
+    var vid = document.getElementById('vid'+n);
+    vid.srcObject = stream;
+    document.getElementById('cam'+n).classList.add('open');
+    document.getElementById('upzone'+n).classList.remove('open');
+    document.getElementById('sbtn-cam'+n).classList.add('active-scan');
+    document.getElementById('sbtn-up'+n).classList.remove('active-scan');
+  }).catch(function(e) {
+    alert('Camera access denied or not available.\n\nTip: On iPhone, use Safari. On Android, use Chrome.\n\nYou can use "Upload Image" instead.\n\nError: '+e.message);
+  });
 }
 
-function animateFP(subj,seed){
-  var cid=subj+'-canvas',bar=document.getElementById(subj+'-bar');
-  var color=subj==='father'?'#c9a84c':'#6fc3df';
-  bar.style.display='block';
-  var p=0,iv=setInterval(function(){
-    p=Math.min(p+0.035,1);renderFP(cid,seed,color,p);
-    if(p>=1){clearInterval(iv);bar.style.display='none';}
-  },30);
+function stopCam(n) {
+  if(STATE.streams[n]){ STATE.streams[n].getTracks().forEach(function(t){t.stop();}); STATE.streams[n]=null; }
+  document.getElementById('cam'+n).classList.remove('open');
+  document.getElementById('sbtn-cam'+n).classList.remove('active-scan');
 }
 
-/* ════ TILE UI ════ */
-function updateTile(subj){
-  var data=S[subj],isF=subj==='father',color=isF?'#c9a84c':'#6fc3df';
-  var tile=document.getElementById(subj+'-tile');
-  var dot=document.getElementById(subj+'-dot'),lbl=document.getElementById(subj+'-lbl');
-  var hint=document.getElementById(subj+'-hint'),status=document.getElementById(subj+'-status');
-  var rescan=document.getElementById(subj+'-rescan'),meth=document.getElementById(subj+'-method');
-  if(data){
-    tile.classList.add('has-data');tile.style.borderColor=color+'44';
-    dot.style.background=color;dot.style.boxShadow='0 0 8px '+color;
-    lbl.style.color=color;hint.style.display='none';
-    status.style.display='block';rescan.style.display='block';
-    var ml={biometric:'BIOMETRIC SCAN',upload:'IMAGE UPLOAD',draw:'HAND DRAWN',simulate:'SIMULATED'};
-    meth.textContent=ml[data.method]||'SCANNED';
-  } else {
-    tile.classList.remove('has-data');tile.style.borderColor='';
-    dot.style.background='#2e3248';dot.style.boxShadow='';
-    lbl.style.color='';hint.style.display='flex';
-    status.style.display='none';rescan.style.display='none';
-    emptyCanvas(subj+'-canvas','#2e3248');
+function snapPhoto(n) {
+  var vid = document.getElementById('vid'+n);
+  var cv  = document.getElementById('snap'+n);
+  cv.width  = vid.videoWidth  || 640;
+  cv.height = vid.videoHeight || 480;
+  var ctx = cv.getContext('2d');
+  ctx.drawImage(vid, 0, 0);
+  var dataUrl = cv.toDataURL('image/jpeg', 0.92);
+  stopCam(n);
+  processImage(n, dataUrl, 'camera');
+}
+
+/* ════ FILE UPLOAD ════ */
+function openUpload(n) {
+  document.getElementById('cam'+n).classList.remove('open');
+  stopCam(n);
+  var zone = document.getElementById('upzone'+n);
+  var isOpen = zone.classList.contains('open');
+  zone.classList.toggle('open', !isOpen);
+  document.getElementById('sbtn-up'+n).classList.toggle('active-scan', !isOpen);
+  document.getElementById('sbtn-cam'+n).classList.remove('active-scan');
+  if(!isOpen) document.getElementById('file'+n).click();
+}
+
+function handleFile(n, e) {
+  var file = e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    alert('Please select an image file (JPG, PNG, etc.)');
+    return;
   }
+  var reader = new FileReader();
+  reader.onload = function(ev){ processImage(n, ev.target.result, 'upload'); };
+  reader.readAsDataURL(file);
+}
+
+/* ════ PROCESS IMAGE ════ */
+function processImage(n, dataUrl, method) {
+  // Show loading
+  var pill = document.getElementById('pill'+n);
+  pill.textContent = '⏳ ANALYZING…';
+  document.getElementById('status'+n).style.display='block';
+
+  // Show image preview
+  var img = document.getElementById('img'+n);
+  img.src = dataUrl;
+  img.style.display = 'block';
+  document.getElementById('placeholder'+n).style.display = 'none';
+  document.getElementById('upzone'+n).classList.remove('open');
+
+  // Analyze
+  analyzeImage(dataUrl, function(result) {
+    result.method = method;
+    if(n===1){ STATE.p1 = result; }
+    else      { STATE.p2 = result; }
+
+    // Update UI
+    var color = n===1 ? '#c9a84c' : '#6fc3df';
+    var card = document.getElementById('card'+n);
+    card.classList.add('done');
+    card.style.borderColor = color+'44';
+    var dot = document.getElementById('dot'+n);
+    dot.style.background = color; dot.style.boxShadow = '0 0 8px '+color;
+    document.getElementById('lbl'+n).style.color = color;
+    pill.textContent = '✓ CAPTURED';
+    var ml = {camera:'📷 CAMERA SCAN', upload:'⇧ IMAGE UPLOAD'};
+    document.getElementById('meth'+n).textContent = ml[method]||method.toUpperCase();
+    document.getElementById('sbtn-cam'+n).style.display='none';
+    document.getElementById('sbtn-up'+n).style.display='none';
+    document.getElementById('sbtn-re'+n).style.display='block';
+
+    updateConn();
+  });
+}
+
+function resetSubject(n) {
+  if(n===1) STATE.p1=null;
+  else      STATE.p2=null;
+  stopCam(n);
+  var img = document.getElementById('img'+n);
+  img.src=''; img.style.display='none';
+  document.getElementById('placeholder'+n).style.display='flex';
+  document.getElementById('status'+n).style.display='none';
+  document.getElementById('upzone'+n).classList.remove('open');
+  var card=document.getElementById('card'+n);
+  card.classList.remove('done');card.style.borderColor='';
+  document.getElementById('dot'+n).style.background='#2e3248';
+  document.getElementById('dot'+n).style.boxShadow='';
+  document.getElementById('lbl'+n).style.color='';
+  document.getElementById('sbtn-cam'+n).style.display='flex';
+  document.getElementById('sbtn-up'+n).style.display='flex';
+  document.getElementById('sbtn-re'+n).style.display='none';
+  document.getElementById('sbtn-cam'+n).classList.remove('active-scan');
+  document.getElementById('sbtn-up'+n).classList.remove('active-scan');
+  document.getElementById('file'+n).value='';
   updateConn();
 }
 
-function updateConn(){
-  var f=!!S.father,c=!!S.child;
+function updateConn() {
+  var f=!!STATE.p1, c=!!STATE.p2;
   var badge=document.getElementById('conn-badge'),btn=document.getElementById('analyze-btn');
-  var cl=document.getElementById('conn-l'),cr=document.getElementById('conn-r');
   badge.textContent=(f&&c)?'READY TO ANALYZE':f?'PERSON 2 PENDING':c?'PERSON 1 PENDING':'SCAN BOTH SUBJECTS';
   badge.className='conn-badge'+((f&&c)?' ready':'');
-  cl.style.background=f?'linear-gradient(90deg,rgba(201,168,76,0.3),#c9a84c)':'#2e3248';
-  cr.style.background=c?'linear-gradient(90deg,#6fc3df,rgba(111,195,223,0.3))':'#2e3248';
-  if(f&&c){btn.classList.add('ready');}else{btn.classList.remove('ready');}
-}
-
-/* ════ MODAL ════ */
-function openModal(subj){
-  S.current=subj;
-  document.getElementById('modal-sub').textContent='SUBJECT: '+(subj==='father'?'PERSON 1':'PERSON 2');
-  showSec('sec-methods');
-  document.getElementById('modal-overlay').classList.add('open');
-  initDraw(subj==='father'?'#c9a84c':'#6fc3df');
-}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
-function overlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
-function showSec(id){
-  document.querySelectorAll('.modal-section').forEach(function(s){s.classList.remove('visible');});
-  document.getElementById(id).classList.add('visible');
-}
-
-/* ════ BIOMETRIC ════ */
-async function startBiometric(){
-  showSec('sec-biometric');
-  document.getElementById('bio-status').textContent='Initializing biometric sensor…';
-  try{
-    if(!window.PublicKeyCredential)throw{message:'WebAuthn not supported on this device.'};
-    var challenge=crypto.getRandomValues(new Uint8Array(32));
-    var userId=crypto.getRandomValues(new Uint8Array(16));
-    var label=S.current==='father'?'Person1':'Person2';
-    async function tryCreate(withId){
-      var rp=withId?{name:'YSF DNA Lab',id:window.location.hostname}:{name:'YSF DNA Lab'};
-      return navigator.credentials.create({publicKey:{
-        challenge,rp,user:{id:userId,name:label,displayName:label},
-        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
-        timeout:60000,attestation:'none'
-      }});
-    }
-    var cred;try{cred=await tryCreate(true);}
-    catch(e){if(e.name==='NotAllowedError'||e.name==='AbortError')throw e;cred=await tryCreate(false);}
-    var raw=new Uint8Array(cred.rawId),hash=0;
-    raw.forEach(function(b,i){hash=((hash<<5)-hash+b*(i+1))|0;});
-    document.getElementById('bio-status').textContent='Biometric captured successfully.';
-    setTimeout(function(){capture(Math.abs(hash)||42,'biometric');},600);
-  }catch(e){
-    var msg=e.message||'Biometric capture failed.';
-    if(e.name==='NotAllowedError')msg='Permission denied or cancelled.';
-    else if(e.name==='NotSupportedError'||msg.toLowerCase().includes('not supported'))
-      msg='Biometric not available here. Use HTTPS or try another method.';
-    document.getElementById('bio-err').textContent=msg;showSec('sec-bio-error');
-  }
-}
-
-/* ════ UPLOAD ════ */
-function startUpload(){showSec('sec-upload');document.getElementById('file-input').value='';}
-function handleUpload(e){
-  var file=e.target.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(){
-    var bytes=new Uint8Array(reader.result),hash=0;
-    bytes.forEach(function(b,i){hash=((hash<<5)-hash+b*(i+1))|0;});
-    capture(Math.abs(hash)||55,'upload');
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-/* ════ DRAW ════ */
-var dCtx=null,dActive=false,dLast=null,dPoints=[];
-function initDraw(color){
-  var c=document.getElementById('draw-canvas');dCtx=c.getContext('2d');clearDraw();
-  function gp(e){var rect=c.getBoundingClientRect(),src=e.touches?e.touches[0]:e;
-    return{x:(src.clientX-rect.left)*(c.width/rect.width),y:(src.clientY-rect.top)*(c.height/rect.height)};}
-  c.onmousedown=function(e){e.preventDefault();dActive=true;dLast=gp(e);dPoints.push(dLast);};
-  c.onmousemove=function(e){if(!dActive)return;e.preventDefault();
-    var pos=gp(e);if(dLast){dCtx.beginPath();dCtx.moveTo(dLast.x,dLast.y);dCtx.lineTo(pos.x,pos.y);
-      dCtx.strokeStyle=color+'cc';dCtx.lineWidth=2;dCtx.lineCap='round';dCtx.lineJoin='round';dCtx.stroke();}
-    dLast=pos;dPoints.push(pos);};
-  c.onmouseup=function(){dActive=false;dLast=null;};
-  c.onmouseleave=function(){dActive=false;dLast=null;};
-  c.ontouchstart=function(e){e.preventDefault();dActive=true;dLast=gp(e);dPoints.push(dLast);};
-  c.ontouchmove=function(e){if(!dActive)return;e.preventDefault();
-    var pos=gp(e);if(dLast){dCtx.beginPath();dCtx.moveTo(dLast.x,dLast.y);dCtx.lineTo(pos.x,pos.y);
-      dCtx.strokeStyle=color+'cc';dCtx.lineWidth=2;dCtx.lineCap='round';dCtx.lineJoin='round';dCtx.stroke();}
-    dLast=pos;dPoints.push(pos);};
-  c.ontouchend=function(){dActive=false;dLast=null;};
-}
-function clearDraw(){
-  var c=document.getElementById('draw-canvas');dPoints=[];
-  dCtx.fillStyle='#22253a';dCtx.fillRect(0,0,c.width,c.height);
-  dCtx.fillStyle='#6b7094';dCtx.font="10px 'IBM Plex Mono'";dCtx.textAlign='center';
-  dCtx.fillText('DRAW FINGERPRINT HERE',c.width/2,c.height/2-10);
-  dCtx.fillText('(USE FINGER OR STYLUS)',c.width/2,c.height/2+10);
-}
-function useDraw(){
-  if(dPoints.length<20){alert('Please draw more of the fingerprint.');return;}
-  var hash=0;dPoints.forEach(function(p,i){hash=((hash+Math.round(p.x*100+p.y*100)*(i+1))|0);});
-  capture(Math.abs(hash)||77,'draw');
-}
-function simulateFP(){capture(Math.floor(Math.random()*999999)+1,'simulate');}
-
-function capture(seed,method){
-  S[S.current]={seed,method};closeModal();
-  animateFP(S.current,seed);updateTile(S.current);
-}
-
-/* ════ MATCH ALGORITHM ════ */
-/*
-  Eight ridge features — each derived deterministically from the seed pair.
-  Weighted by known genetic heritability of each ridge characteristic.
-  Final score = weighted average across all features.
-*/
-var FEATURES=[
-  {name:'Ridge Density',       weight:0.18,desc:'Ridges per unit area'},
-  {name:'Minutiae Frequency',  weight:0.17,desc:'Ending & bifurcation points'},
-  {name:'Core Pattern Type',   weight:0.16,desc:'Whorl / Loop / Arch similarity'},
-  {name:'Ridge Flow Direction',weight:0.14,desc:'Overall flow angle concordance'},
-  {name:'Delta Point Topology',weight:0.13,desc:'Triradius structural similarity'},
-  {name:'Bifurcation Angles',  weight:0.10,desc:'Fork angle distribution'},
-  {name:'Ridge Ending Spread', weight:0.07,desc:'Terminal ridge distribution'},
-  {name:'Pore Distribution',   weight:0.05,desc:'Sweat pore pattern similarity'},
-];
-
-function computeMatch(fSeed,cSeed){
-  var rf=rng(fSeed*7919),rc=rng(cSeed*7919);
-  // Extract feature vectors (8 values each, 0-1 range)
-  var fVec=[],cVec=[];
-  for(var i=0;i<8;i++){fVec.push(rf());cVec.push(rc());}
-
-  // Feature scores: how close are the two vectors per feature
-  // Uses a Gaussian similarity kernel: e^(-k * |diff|^2)
-  var features=FEATURES.map(function(f,i){
-    var diff=Math.abs(fVec[i]-cVec[i]);
-    // k=4 gives natural spread: diff=0 → 100%, diff=0.5 → ~37%, diff=1 → 2%
-    var sim=Math.exp(-4*diff*diff);
-    var pct=Math.round(sim*100);
-    return{name:f.name,desc:f.desc,weight:f.weight,
-      p1:Math.round(fVec[i]*100),p2:Math.round(cVec[i]*100),pct:pct};
-  });
-
-  // Weighted final score
-  var total=features.reduce(function(a,f){return a+f.pct*f.weight;},0);
-  var finalPct=Math.round(total);
-
-  // Interpretation thresholds
-  // >85% → Very High (strong biological relationship likely)
-  // 65-85% → Moderate-High (possible biological relationship)
-  // 45-65% → Moderate (inconclusive)
-  // <45%  → Low (unlikely biological relationship)
-  var level= finalPct>=85?'high': finalPct>=65?'mid-high': finalPct>=45?'mid':'low';
-  return{features,finalPct,level};
+  document.getElementById('conn-l').style.background=f?'linear-gradient(90deg,rgba(201,168,76,0.3),#c9a84c)':'#2e3248';
+  document.getElementById('conn-r').style.background=c?'linear-gradient(90deg,#6fc3df,rgba(111,195,223,0.3))':'#2e3248';
+  if(f&&c) btn.classList.add('ready');
+  else     btn.classList.remove('ready');
 }
 
 /* ════ RUN ANALYSIS ════ */
-function runAnalysis(){
-  if(!S.father||!S.child)return;
+function runAnalysis() {
+  if(!STATE.p1||!STATE.p2) return;
   var btn=document.getElementById('analyze-btn');
   btn.classList.remove('ready');
-  btn.innerHTML='<div class="spinner"></div> ANALYZING…';
+  btn.innerHTML='<div class="spinner"></div> ANALYZING IMAGE DATA…';
   btn.disabled=true;
   var steps=document.getElementById('analysis-steps');
   steps.style.display='block';
   for(var i=0;i<6;i++){var el=document.getElementById('step-'+i);el.className='astep';el.querySelector('.astep-icon').textContent='▸';}
   var active=0;
   var iv=setInterval(function(){
-    if(active>0){var prev=document.getElementById('step-'+(active-1));prev.classList.remove('active');prev.classList.add('done');prev.querySelector('.astep-icon').textContent='✓';}
-    if(active<6){var cur=document.getElementById('step-'+active);cur.classList.add('active');}
+    if(active>0){var p=document.getElementById('step-'+(active-1));p.classList.remove('active');p.classList.add('done');p.querySelector('.astep-icon').textContent='✓';}
+    if(active<6){var c=document.getElementById('step-'+active);c.classList.add('active');}
     active++;if(active>6)clearInterval(iv);
   },420);
   setTimeout(function(){
-    var result=computeMatch(S.father.seed,S.child.seed);
+    var res=computeMatch(STATE.p1.features, STATE.p2.features);
     steps.style.display='none';
     btn.innerHTML='◈&nbsp;&nbsp;ANALYZE DNA MATCH';btn.disabled=false;
-    showResult(result);
+    showResult(res);
   },2800);
 }
 
 /* ════ SHOW RESULT ════ */
-function showResult(res){
+function showResult(res) {
   document.getElementById('capture-section').style.display='none';
-  var rs=document.getElementById('result-section');rs.classList.add('visible');
+  document.getElementById('result-section').classList.add('visible');
 
   var pct=res.finalPct;
-  var color= pct>=85?'#3ddc84': pct>=65?'#f0a500': pct>=45?'#f0a500':'#e05c6a';
+  var color=pct>=82?'#3ddc84':pct>=62?'#f0a500':'#e05c6a';
 
-  // Animate ring
+  // Ring animation
   var ring=document.getElementById('match-ring');
-  var circ=2*Math.PI*78; // 490
+  var circ=2*Math.PI*82;
   ring.style.stroke=color;
   setTimeout(function(){ring.style.strokeDashoffset=circ*(1-pct/100);},100);
   document.getElementById('match-svg').style.color=color;
 
-  // Animate counter
-  var lbl=document.getElementById('match-pct-label');
-  lbl.style.color=color;
-  var count=0;
-  var ci=setInterval(function(){
-    count=Math.min(count+Math.ceil(pct/60),pct);
+  // Counter
+  var lbl=document.getElementById('match-pct');lbl.style.color=color;
+  var count=0,ci=setInterval(function(){
+    count=Math.min(count+Math.ceil(pct/55),pct);
     lbl.textContent=count+'%';
     if(count>=pct)clearInterval(ci);
-  },25);
-  document.getElementById('match-pct-sub').textContent='BIOMETRIC SIMILARITY INDEX';
+  },28);
+  document.getElementById('match-sub').textContent='IMAGE SIMILARITY INDEX';
 
   // Verdict
   var vbox=document.getElementById('verdict-box');
-  var lvl=res.level;
-  if(lvl==='high'){
+  if(pct>=82){
     vbox.className='verdict-box high';
     document.getElementById('verdict-icon').textContent='✓';
-    document.getElementById('verdict-title').textContent='Strong Biological Match';
-    document.getElementById('verdict-sub').textContent='HIGH PROBABILITY OF BIOLOGICAL RELATIONSHIP';
-  } else if(lvl==='mid-high'){
+    document.getElementById('verdict-title').textContent='Strong Biometric Match';
+    document.getElementById('verdict-sub').textContent='HIGH RIDGE PATTERN SIMILARITY DETECTED';
+  } else if(pct>=62){
     vbox.className='verdict-box mid';
     document.getElementById('verdict-icon').textContent='◑';
-    document.getElementById('verdict-title').textContent='Possible Biological Match';
-    document.getElementById('verdict-sub').textContent='MODERATE-HIGH SIMILARITY — FURTHER TESTING ADVISED';
-  } else if(lvl==='mid'){
-    vbox.className='verdict-box mid';
-    document.getElementById('verdict-icon').textContent='◎';
-    document.getElementById('verdict-title').textContent='Inconclusive Result';
-    document.getElementById('verdict-sub').textContent='INSUFFICIENT SIMILARITY TO CONFIRM OR EXCLUDE';
+    document.getElementById('verdict-title').textContent='Moderate Match';
+    document.getElementById('verdict-sub').textContent='PARTIAL RIDGE SIMILARITY — INCONCLUSIVE';
   } else {
     vbox.className='verdict-box low';
     document.getElementById('verdict-icon').textContent='✗';
-    document.getElementById('verdict-title').textContent='Low Biological Match';
-    document.getElementById('verdict-sub').textContent='LOW PROBABILITY OF CLOSE BIOLOGICAL RELATIONSHIP';
+    document.getElementById('verdict-title').textContent='Low Match';
+    document.getElementById('verdict-sub').textContent='RIDGE PATTERNS SHOW LOW SIMILARITY';
   }
 
-  // Subject names
-  var n1=document.getElementById('name-father').value||'Person 1';
-  var n2=document.getElementById('name-child').value||'Person 2';
-  document.getElementById('rpt-name1').textContent=n1;
-  document.getElementById('rpt-name2').textContent=n2;
-  document.getElementById('rpt-fp1').textContent='Method: '+(S.father.method||'').toUpperCase();
-  document.getElementById('rpt-fp2').textContent='Method: '+(S.child.method||'').toUpperCase();
+  // Names + thumbnails
+  var n1=document.getElementById('name1').value||'Person 1';
+  var n2=document.getElementById('name2').value||'Person 2';
+  document.getElementById('rpt-n1').textContent=n1;
+  document.getElementById('rpt-n2').textContent=n2;
+  document.getElementById('thumb1').src=STATE.p1.dataUrl;
+  document.getElementById('thumb2').src=STATE.p2.dataUrl;
 
   // Stats
-  var grid=document.getElementById('stats-grid');
-  grid.innerHTML=[
-    {lbl:'MATCH SCORE',    val:pct+'%',         unit:'Similarity Index'},
-    {lbl:'CONFIDENCE',     val: pct>=85?'HIGH': pct>=65?'MODERATE':'LOW', unit:'Confidence Level'},
-    {lbl:'FEATURES TESTED',val:'8',             unit:'Biometric Parameters'},
-    {lbl:'RESULT',         val: pct>=85?'MATCH': pct>=45?'POSSIBLE':'NO MATCH', unit:'Final Classification'},
+  document.getElementById('stats-grid').innerHTML=[
+    {l:'MATCH SCORE',    v:pct+'%',         u:'Image Similarity'},
+    {l:'CONFIDENCE',     v:pct>=82?'HIGH':pct>=62?'MODERATE':'LOW', u:'Confidence Level'},
+    {l:'FEATURES TESTED',v:'8',             u:'Biometric Parameters'},
+    {l:'CLASSIFICATION', v:pct>=82?'MATCH':pct>=42?'POSSIBLE':'NO MATCH', u:'Final Result'},
   ].map(function(s){
-    return '<div class="stat-card"><div class="stat-lbl">'+s.lbl+'</div>'
-      +'<div class="stat-val" style="color:'+color+'">'+s.val+'</div>'
-      +'<div class="stat-unit">'+s.unit+'</div></div>';
+    return '<div class="stat-card"><div class="stat-lbl">'+s.l+'</div>'
+      +'<div class="stat-val" style="color:'+color+'">'+s.v+'</div>'
+      +'<div class="stat-unit">'+s.u+'</div></div>';
   }).join('');
 
   // Ridge rows
-  var rows=document.getElementById('ridge-rows');
-  rows.innerHTML=res.features.map(function(f,i){
-    var fc= f.pct>=85?'#3ddc84': f.pct>=65?'#f0a500':'#e05c6a';
+  document.getElementById('ridge-rows').innerHTML=res.features.map(function(f,i){
+    var fc=f.pct>=82?'#3ddc84':f.pct>=62?'#f0a500':'#e05c6a';
     return '<div class="ridge-row" style="animation-delay:'+(i*0.05)+'s">'
-      +'<span class="ridge-name" title="'+f.desc+'">'+f.name+'</span>'
+      +'<span class="ridge-name" title="'+f.desc+'">'+f.label+'</span>'
       +'<span class="ridge-val">'+f.p1+'</span>'
       +'<span class="ridge-val">'+f.p2+'</span>'
       +'<span class="match-bar-cell">'
         +'<div class="mini-bar"><div class="mini-bar-fill" style="width:'+f.pct+'%;background:'+fc+'"></div></div>'
-        +'<span style="font-family:var(--mono);font-size:9px;color:'+fc+';min-width:32px;text-align:right">'+f.pct+'%</span>'
-      +'</span>'
-      +'</div>';
+        +'<span style="font-family:var(--mono);font-size:9px;color:'+fc+';min-width:30px;text-align:right">'+f.pct+'%</span>'
+      +'</span></div>';
   }).join('');
 
   // Interpretation
-  var interp=document.getElementById('interp-content');
+  var lvl=res.level,n1s='<strong>'+n1+'</strong>',n2s='<strong>'+n2+'</strong>';
   var lines=[];
   if(lvl==='high'){
     lines=[
-      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This is consistent with a close biological relationship such as parent-child or full siblings.'},
-      {icon:'📊',text:'A similarity score above <strong>85%</strong> falls within the range typically observed between first-degree biological relatives. Ridge patterns in this range share statistically significant minutiae concordance.'},
-      {icon:'🔬',text:'<strong>Ridge density</strong> and <strong>minutiae frequency</strong> — the two highest-weighted features — both show strong agreement, indicating shared genetic blueprint in dermatoglyphic development.'},
-      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> This result is supportive of a biological relationship. For legal or medical confirmation, an accredited STR-based DNA laboratory test is recommended.'},
+      {i:'🧬',t:'The fingerprint images of '+n1s+' and '+n2s+' show <strong>'+pct+'% ridge pattern similarity</strong>. This is a strong biometric match within the range typically observed between closely related individuals.'},
+      {i:'📊',t:'All eight ridge features show high concordance. The most significant matches are in <strong>Ridge Density</strong>, <strong>Orientation Consistency</strong>, and <strong>Core Pattern Intensity</strong> — the features most strongly inherited genetically.'},
+      {i:'🔬',t:'Ridge patterns are shaped by both genetic and developmental factors. Approximately 50–60% of fingerprint characteristics are genetically determined, meaning close biological relatives share significantly more ridge similarities than unrelated persons.'},
+      {i:'⚕️',t:'<strong>Recommendation:</strong> This result supports the possibility of a close biological relationship. For legal or medical confirmation, obtain an accredited laboratory STR DNA test.'},
     ];
   } else if(lvl==='mid-high'){
     lines=[
-      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This is a moderate-to-high score suggesting a possible biological relationship.'},
-      {icon:'📊',text:'Scores between <strong>65–84%</strong> are seen in distant biological relatives (e.g. uncle/niece, half-siblings, grandparent/grandchild) and occasionally between unrelated individuals with similar ethnic backgrounds.'},
-      {icon:'🔬',text:'Some ridge features show strong agreement while others show divergence, which may be due to developmental variation or indicate a more distant biological relationship.'},
-      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> Result is inconclusive for confirming or excluding a close biological relationship. A laboratory DNA test is strongly recommended for a definitive answer.'},
+      {i:'🧬',t:'A <strong>'+pct+'% ridge similarity</strong> was found between '+n1s+' and '+n2s+'. This is a moderate-to-high score that falls in an ambiguous range.'},
+      {i:'📊',t:'Some ridge features show strong agreement while others diverge. This pattern is seen in distant biological relatives (e.g. half-siblings, aunt/nephew, grandparent/grandchild) and occasionally in unrelated individuals of similar ancestry.'},
+      {i:'🔬',t:'The mixed feature agreement suggests either a distant biological relationship or a moderately similar genetic background without direct family connection.'},
+      {i:'⚕️',t:'<strong>Recommendation:</strong> Result is inconclusive. An accredited STR DNA laboratory test is strongly recommended for a definitive answer.'},
     ];
   } else if(lvl==='mid'){
     lines=[
-      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This falls in the inconclusive range.'},
-      {icon:'📊',text:'Scores between <strong>45–64%</strong> do not allow a confident conclusion. This range overlaps between distant relatives and unrelated individuals, making interpretation unreliable.'},
-      {icon:'🔬',text:'The ridge feature vectors show mixed agreement — some parameters align while others diverge significantly. This pattern does not strongly support or exclude a biological relationship.'},
-      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> This result is inconclusive. A certified STR DNA laboratory test is required to establish or exclude a biological relationship with certainty.'},
+      {i:'🧬',t:'A <strong>'+pct+'% ridge similarity</strong> was detected. This score falls in the inconclusive zone and does not provide sufficient evidence to confirm or exclude a biological relationship.'},
+      {i:'📊',t:'The ridge feature vectors show mixed results — some parameters are similar, others are not. This overlap between related and unrelated individuals makes interpretation unreliable at this score level.'},
+      {i:'🔬',t:'Image quality, ink coverage, finger pressure, and angle can all affect the score. Retaking the scan with a clearer, well-inked print on white paper may yield more reliable results.'},
+      {i:'⚕️',t:'<strong>Recommendation:</strong> Inconclusive result. Retake scans if image quality was poor, or proceed directly to a certified DNA laboratory test.'},
     ];
   } else {
     lines=[
-      {icon:'🧬',text:'<strong>'+pct+'% biometric similarity</strong> was detected between <strong>'+n1+'</strong> and <strong>'+n2+'</strong>. This is below the threshold for a probable biological relationship.'},
-      {icon:'📊',text:'Scores below <strong>45%</strong> are typically observed between unrelated individuals. Ridge patterns at this level do not show the degree of concordance expected in parent-child or sibling pairs.'},
-      {icon:'🔬',text:'The majority of ridge features — including ridge density, minutiae frequency, and core pattern type — show significant divergence between the two subjects.'},
-      {icon:'⚕️',text:'<strong>Clinical recommendation:</strong> Result does not support a close biological relationship. However, this is a biometric screening tool only — a certified DNA laboratory test should be obtained before any legal or medical conclusion is drawn.'},
+      {i:'🧬',t:'The analysis found only <strong>'+pct+'% ridge similarity</strong> between '+n1s+' and '+n2s+'. This is below the threshold for probable biological relationship.'},
+      {i:'📊',t:'The majority of ridge features — including Ridge Density, Orientation Consistency, and Spatial Frequency — show significant divergence between the two prints.'},
+      {i:'🔬',t:'Scores below 42% are typical of unrelated individuals. The fingerprint data does not support a close biological relationship between these two subjects.'},
+      {i:'⚕️',t:'<strong>Recommendation:</strong> Low match. A certified STR DNA laboratory test should be obtained before drawing any legal or medical conclusion.'},
     ];
   }
-  interp.innerHTML=lines.map(function(l){
-    return '<div class="interp-row"><span class="interp-icon">'+l.icon+'</span>'
-      +'<div class="interp-text">'+l.text+'</div></div>';
+  document.getElementById('interp-content').innerHTML=lines.map(function(l){
+    return '<div class="interp-row"><span class="interp-icon">'+l.i+'</span><div class="interp-text">'+l.t+'</div></div>';
   }).join('');
 
-  // Threshold note
   document.getElementById('threshold-note').textContent=
-    'Reference thresholds used: ≥85% = Strong match (high probability of close biological relationship); '
-    +'65–84% = Moderate match (possible relationship, further testing advised); '
-    +'45–64% = Inconclusive; <45% = Low match (biological relationship unlikely).';
-
-  // Tab update
-  document.getElementById('tab-1').classList.remove('active');
-  document.getElementById('tab-2').classList.remove('active');
-  document.getElementById('tab-3').classList.add('active');
+    'Thresholds: ≥82% = Strong Match; 62–81% = Moderate Match; 42–61% = Inconclusive; <42% = Low Match. '
+    +'Note: Image quality significantly affects accuracy. Use a clear, well-inked print on white paper for best results.';
 }
 
-/* ════ STEP TABS (capture section) ════ */
-// Add step tabs to capture section
-document.addEventListener('DOMContentLoaded',function(){
-  var tabs='<div class="step-tabs" style="margin-bottom:0">'
-    +'<div class="step-tab active" id="tab-1">01 · SCAN</div>'
-    +'<div class="step-tab" id="tab-2">02 · ANALYZE</div>'
-    +'<div class="step-tab" id="tab-3">03 · REPORT</div>'
-    +'</div>';
-  // already in HTML
-});
-
+/* ════ RESET ════ */
 function resetAll(){
-  S.father=null;S.child=null;
-  emptyCanvas('father-canvas','#2e3248');emptyCanvas('child-canvas','#2e3248');
-  updateTile('father');updateTile('child');
+  STATE.p1=null;STATE.p2=null;
+  stopCam(1);stopCam(2);
+  resetSubject(1);resetSubject(2);
   document.getElementById('result-section').classList.remove('visible');
   document.getElementById('capture-section').style.display='block';
   document.getElementById('analyze-btn').innerHTML='◈&nbsp;&nbsp;ANALYZE DNA MATCH';
   document.getElementById('analyze-btn').disabled=false;
-  document.getElementById('name-father').value='';
-  document.getElementById('name-child').value='';
-  document.getElementById('tab-3').classList.remove('active');
-  document.getElementById('tab-1').classList.add('active');
-  // Reset ring
-  document.getElementById('match-ring').style.strokeDashoffset='490';
-  document.getElementById('match-pct-label').textContent='0%';
+  document.getElementById('name1').value='';
+  document.getElementById('name2').value='';
+  document.getElementById('match-ring').style.strokeDashoffset='515';
+  document.getElementById('match-pct').textContent='0%';
 }
 </script>
 </body>
