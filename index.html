@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>YSF Genomic Laboratory — DNA Paternity Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #12131a;
+    --surface:   #1c1e2b;
+    --panel:     #22253a;
+    --border:    #2e3248;
+    --gold:      #c9a84c;
+    --gold-lt:   #e8c96a;
+    --gold-dim:  rgba(201,168,76,0.27);
+    --gold-faint:rgba(201,168,76,0.10);
+    --green:     #3ddc84;
+    --green-dim: rgba(61,220,132,0.18);
+    --red:       #e05c6a;
+    --red-dim:   rgba(224,92,106,0.18);
+    --cream:     #eae6dc;
+    --muted:     #6b7094;
+    --muted-lt:  #8990b8;
+    --blue:      #6fc3df;
+    --mono:      'IBM Plex Mono', 'Courier New', monospace;
+    --display:   'Playfair Display', Georgia, serif;
+    --body:      'Lato', 'Helvetica Neue', sans-serif;
+  }
+
+  html, body {
+    background: var(--bg); color: var(--cream);
+    font-family: var(--body); min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 100% 40% at 50% -5%, #1e1a0a 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 100% 100%, #081420 0%, transparent 60%);
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ── LAYOUT ── */
+  #app { max-width: 520px; margin: 0 auto; padding: 0 0 60px; }
+
+  /* ── HEADER ── */
+  #header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 20px 0;
+  }
+  .logo-wrap { display: flex; align-items: center; gap: 10px; }
+  .logo-box {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold), #8a5c1a);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(201,168,76,0.3), inset 0 1px 0 rgba(232,201,106,0.4);
+    font-family: var(--display); font-weight: 700; font-size: 15px;
+    color: #1a1000; letter-spacing: 0.5px; flex-shrink: 0;
+  }
+  .logo-name { font-family: var(--display); font-size: 15px; color: var(--gold); line-height: 1.2; }
+  .logo-sub  { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: 2.5px; margin-top: 1px; }
+  .header-right { text-align: right; }
+  .case-id   { font-family: var(--mono); font-size: 9px; color: rgba(201,168,76,0.8); letter-spacing: 1px; }
+  .timestamp { font-family: var(--mono); font-size: 8px; color: var(--muted); margin-top: 2px; }
+
+  .gold-line {
+    margin: 14px 20px 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), var(--gold), rgba(201,168,76,0.4), transparent);
+  }
+
+  /* ── BODY ── */
+  #body { padding: 24px 20px; }
+
+  h1.title {
+    font-family: var(--display); font-size: 26px; font-style: italic;
+    font-weight: 700; line-height: 1.2; margin-bottom: 5px;
+    background: linear-gradient(135deg, var(--cream) 30%, var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 3px; }
+
+  /* ── STEP TABS ── */
+  .step-tabs { display: flex; gap: 8px; margin: 18px 0; }
+  .step-tab {
+    flex: 1; text-align: center; padding: 7px 4px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 7px;
+    font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted);
+    transition: all 0.3s;
+  }
+  .step-tab.active {
+    background: var(--gold-faint); border-color: rgba(201,168,76,0.34); color: var(--gold);
+  }
+
+  /* ── TILES ── */
+  .tiles { display: flex; gap: 12px; margin-bottom: 18px; }
+  .tile {
+    flex: 1; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    transition: border-color 0.4s, box-shadow 0.4s; cursor: pointer;
+  }
+  .tile.has-data { box-shadow: 0 0 30px rgba(201,168,76,0.10); }
+  .tile.child.has-data { box-shadow: 0 0 30px rgba(111,195,223,0.10); }
+  .tile-label-row { display: flex; align-items: center; gap: 8px; }
+  .tile-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border); transition: all 0.4s;
+  }
+  .tile-label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--muted);
+    transition: color 0.3s;
+  }
+  .canvas-wrap {
+    position: relative; width: 148px; height: 148px; border-radius: 50%; overflow: visible;
+  }
+  .fp-canvas { display: block; border-radius: 50%; background: var(--panel); }
+  .scan-bar {
+    display: none; position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    box-shadow: 0 0 8px var(--gold);
+    animation: scanLine 1.4s ease-in-out infinite;
+  }
+  .scan-bar.child-bar {
+    background: linear-gradient(90deg, transparent, var(--blue), transparent);
+    box-shadow: 0 0 8px var(--blue);
+  }
+  .tile-empty-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    pointer-events: none;
+  }
+  .tile-empty-hint span {
+    font-family: var(--mono); font-size: 9px; color: var(--muted);
+    letter-spacing: 2px; text-align: center; line-height: 1.6;
+  }
+  .tile-status { text-align: center; }
+  .captured-badge {
+    display: inline-block; font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+    color: var(--gold); background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2); border-radius: 4px; padding: 3px 10px;
+    margin-bottom: 4px;
+  }
+  .child .captured-badge { color: var(--blue); background: rgba(111,195,223,0.1); border-color: rgba(111,195,223,0.2); }
+  .method-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+  .ref-label    { font-family: var(--mono); font-size: 8px; color: rgba(107,112,148,0.6); margin-top: 2px; }
+  .rescan-btn {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 2px; padding: 4px 12px;
+    background: transparent; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .rescan-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); }
+
+  /* ── CONNECTOR ── */
+  .connector { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .conn-line { flex: 1; height: 1px; background: var(--border); transition: background 0.4s; }
+  .conn-badge {
+    font-family: var(--mono); font-size: 8px; letter-spacing: 2px; white-space: nowrap;
+    color: var(--muted); padding: 4px 12px;
+    border: 1px solid var(--border); border-radius: 20px; background: transparent;
+    transition: all 0.3s;
+  }
+  .conn-badge.ready { color: var(--gold); border-color: rgba(201,168,76,0.3); background: var(--gold-faint); }
+
+  /* ── ANALYZE BUTTON ── */
+  #analyze-btn {
+    width: 100%; padding: 15px;
+    background: transparent; border: 1.5px solid var(--border);
+    border-radius: 12px; cursor: not-allowed;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 4px;
+    color: var(--muted); transition: all 0.3s; display: flex;
+    align-items: center; justify-content: center; gap: 10px;
+  }
+  #analyze-btn.ready {
+    background: linear-gradient(135deg, rgba(201,168,76,0.13), rgba(201,168,76,0.04));
+    border-color: var(--gold); color: var(--gold); cursor: pointer;
+    box-shadow: 0 0 28px var(--gold-dim);
+  }
+  #analyze-btn.ready:hover {
+    background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(201,168,76,0.08));
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid transparent;
+    border-top-color: var(--gold); border-radius: 50%;
+    animation: spin 0.8s linear infinite; flex-shrink: 0;
+  }
+
+  /* ── ANALYSIS STEPS ── */
+  #analysis-steps {
+    display: none; margin-top: 14px; padding: 14px 16px;
+    background: var(--panel); border-radius: 10px; border: 1px solid var(--border);
+  }
+  .astep {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: var(--muted);
+    transition: color 0.3s;
+  }
+  .astep:last-child { margin-bottom: 0; }
+  .astep-icon { width: 10px; text-align: center; color: var(--border); transition: color 0.3s; }
+  .astep.done .astep-icon  { color: var(--green); }
+  .astep.active .astep-icon { color: var(--gold); animation: dotBlink 0.9s infinite; }
+  .astep.done, .astep.active { color: var(--cream); }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    margin-top: 22px; padding: 14px 16px;
+    background: var(--gold-faint); border: 1px solid rgba(201,168,76,0.14);
+    border-radius: 10px; font-family: var(--mono); font-size: 9px;
+    color: var(--muted); line-height: 1.9; letter-spacing: 0.8px;
+  }
+  .info-box .info-title { color: rgba(201,168,76,0.75); margin-bottom: 5px; letter-spacing: 3px; font-size: 9px; }
+
+  /* ── MODAL ── */
+  #modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+    z-index: 100; align-items: center; justify-content: center; padding: 20px;
+  }
+  #modal-overlay.open { display: flex; }
+  #modal-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 380px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+    animation: modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .modal-title { font-family: var(--display); font-size: 18px; color: var(--cream); font-style: italic; }
+  .modal-sub   { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-top: 3px; }
+  .modal-close {
+    font-family: var(--mono); font-size: 14px; padding: 4px 10px;
+    background: transparent; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; flex-shrink: 0;
+  }
+  .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+  .method-list { display: flex; flex-direction: column; gap: 10px; }
+  .method-btn {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    transition: border-color 0.2s, background 0.2s; width: 100%;
+  }
+  .method-btn:hover { background: var(--bg); }
+  .method-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+  .method-name { font-family: var(--body); font-size: 13px; color: var(--cream); margin-bottom: 2px; }
+  .method-desc { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+
+  .modal-section { display: none; }
+  .modal-section.visible { display: block; }
+
+  .biometric-icon { font-size: 52px; text-align: center; margin-bottom: 14px; animation: pulse 1.5s infinite; }
+  .biometric-status { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-align: center; margin-bottom: 8px; }
+  .biometric-hint   { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; }
+  .error-icon   { font-size: 36px; text-align: center; margin-bottom: 12px; }
+  .error-text   { font-family: var(--mono); font-size: 11px; color: var(--red); text-align: center; margin-bottom: 16px; letter-spacing: 1px; }
+
+  #draw-canvas {
+    display: block; border-radius: 8px;
+    border: 1.5px solid rgba(201,168,76,0.27); touch-action: none; cursor: crosshair;
+    background: var(--panel); margin: 0 auto;
+  }
+  .draw-btns { display: flex; gap: 8px; margin-top: 8px; justify-content: center; }
+
+  .ghost-btn {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+    padding: 6px 16px; background: transparent;
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .ghost-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); }
+  .ghost-btn.accent { border-color: rgba(201,168,76,0.5); color: var(--gold); }
+  .ghost-btn.accent:hover { background: var(--gold-faint); }
+  .ghost-btn.back { margin-top: 10px; width: 100%; }
+
+  /* ── RESULT ── */
+  #result-section { display: none; }
+  #result-section.visible { display: block; animation: fadeUp 0.5s ease; }
+
+  .report-header {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .report-case { font-family: var(--mono); font-size: 9px; color: var(--gold); letter-spacing: 3px; }
+  .report-id   { font-family: var(--mono); font-size: 8px; color: var(--muted); margin-top: 2px; }
+  .report-ts   { font-family: var(--mono); font-size: 8px; color: var(--muted); text-align: right; }
+
+  .verdict-box {
+    border-radius: 14px; padding: 22px 20px;
+    text-align: center; margin-bottom: 18px;
+  }
+  .verdict-icon  { font-size: 46px; margin-bottom: 8px; line-height: 1; }
+  .verdict-title { font-family: var(--display); font-size: 24px; font-style: italic; font-weight: 700; margin-bottom: 6px; }
+  .verdict-sub   { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+
+  .verdict-box.match   { background: var(--green-dim); border: 1.5px solid rgba(61,220,132,0.34); box-shadow: 0 0 40px rgba(61,220,132,0.14); }
+  .verdict-box.nomatch { background: var(--red-dim);   border: 1.5px solid rgba(224,92,106,0.34); box-shadow: 0 0 40px rgba(224,92,106,0.14); }
+  .verdict-box.match   .verdict-title { color: var(--green); }
+  .verdict-box.nomatch .verdict-title { color: var(--red); }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card  {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px;
+  }
+  .stat-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: 2px; margin-bottom: 6px; }
+  .stat-value { font-family: var(--display); font-size: 20px; color: var(--cream); font-style: italic; }
+  .stat-unit  { font-family: var(--mono); font-size: 8px; color: var(--muted-lt); margin-top: 2px; }
+
+  .str-table {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-bottom: 16px;
+  }
+  .str-thead {
+    display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 0.7fr 1fr;
+    padding: 10px 14px; background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 2px;
+  }
+  .str-row {
+    display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 0.7fr 1fr;
+    padding: 7px 14px; font-family: var(--mono); font-size: 9px;
+    border-bottom: 1px solid rgba(46,50,72,0.4); align-items: center;
+    animation: fadeUp 0.3s ease both;
+  }
+  .str-row:last-child { border-bottom: none; }
+  .str-row:nth-child(even) { background: rgba(18,19,26,0.5); }
+  .str-locus { color: var(--cream); letter-spacing: 1px; }
+  .str-allele { color: var(--muted-lt); }
+  .str-match.yes { color: var(--green); font-size: 11px; }
+  .str-match.no  { color: var(--red);   font-size: 11px; }
+  .str-pi.yes { color: var(--green); }
+  .str-pi.no  { color: var(--red); }
+
+  .lab-note {
+    background: var(--gold-faint); border: 1px solid rgba(201,168,76,0.14);
+    border-radius: 10px; padding: 13px 15px; margin-bottom: 20px;
+    font-family: var(--mono); font-size: 9px; color: var(--muted); line-height: 1.9; letter-spacing: 0.5px;
+  }
+  .lab-note-title { color: rgba(201,168,76,0.75); margin-bottom: 5px; letter-spacing: 3px; }
+
+  #reset-btn {
+    width: 100%; padding: 13px;
+    background: transparent; border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--muted); font-family: var(--mono);
+    font-size: 11px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s;
+  }
+  #reset-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); }
+
+  /* ── FOOTER ── */
+  #footer {
+    text-align: center; padding: 0 20px;
+    font-family: var(--mono); font-size: 8px;
+    color: rgba(107,112,148,0.4); letter-spacing: 2px; line-height: 2;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes scanLine  { 0%,100%{top:4%}  50%{top:86%} }
+  @keyframes pulse     { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes fadeUp    { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes modalIn   { from{opacity:0;transform:scale(0.93) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes spin      { to{transform:rotate(360deg)} }
+  @keyframes dotBlink  { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+  .fade-in { animation: fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div class="logo-wrap">
+      <div class="logo-box">YSF</div>
+      <div>
+        <div class="logo-name">Genomic Laboratory</div>
+        <div class="logo-sub">PATERNITY TESTING DIVISION</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="case-id" id="case-id"></div>
+      <div class="timestamp" id="timestamp"></div>
+    </div>
+  </div>
+  <div class="gold-line"></div>
+
+  <!-- BODY -->
+  <div id="body">
+
+    <!-- CAPTURE SECTION -->
+    <div id="capture-section">
+      <div class="fade-in">
+        <h1 class="title">DNA Paternity Match</h1>
+        <p class="subtitle">FINGERPRINT-ASSISTED STR PROFILING</p>
+      </div>
+
+      <div class="step-tabs">
+        <div class="step-tab active" id="tab-1">01 · SCAN</div>
+        <div class="step-tab"        id="tab-2">02 · ANALYZE</div>
+        <div class="step-tab"        id="tab-3">03 · REPORT</div>
+      </div>
+
+      <!-- Tiles -->
+      <div class="tiles">
+
+        <!-- Father tile -->
+        <div class="tile" id="father-tile" onclick="openModal('father')">
+          <div class="tile-label-row">
+            <div class="tile-dot" id="father-dot"></div>
+            <span class="tile-label" id="father-label">FATHER</span>
+          </div>
+          <div class="canvas-wrap">
+            <canvas class="fp-canvas" id="father-canvas" width="148" height="148"></canvas>
+            <div class="scan-bar" id="father-scanbar"></div>
+            <div class="tile-empty-hint" id="father-hint">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
+                <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12"/>
+              </svg>
+              <span>TAP TO<br>SCAN</span>
+            </div>
+          </div>
+          <div class="tile-status" id="father-status" style="display:none">
+            <div class="captured-badge">✓ CAPTURED</div>
+            <div class="method-label" id="father-method"></div>
+            <div class="ref-label" id="father-ref"></div>
+          </div>
+          <button class="rescan-btn" id="father-rescan" style="display:none"
+            onclick="event.stopPropagation(); openModal('father')">RE-SCAN</button>
+        </div>
+
+        <!-- Child tile -->
+        <div class="tile child" id="child-tile" onclick="openModal('child')">
+          <div class="tile-label-row">
+            <div class="tile-dot" id="child-dot" style="background:var(--border)"></div>
+            <span class="tile-label" id="child-label" style="color:var(--muted)">CHILD</span>
+          </div>
+          <div class="canvas-wrap">
+            <canvas class="fp-canvas" id="child-canvas" width="148" height="148"></canvas>
+            <div class="scan-bar child-bar" id="child-scanbar"></div>
+            <div class="tile-empty-hint" id="child-hint">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="#6b7094" stroke-width="1.5" stroke-linecap="round">
+                <path d="M12 11c0-1.66-1.34-3-3-3S6 9.34 6 11c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12"/>
+              </svg>
+              <span>TAP TO<br>SCAN</span>
+            </div>
+          </div>
+          <div class="tile-status" id="child-status" style="display:none">
+            <div class="captured-badge" style="color:var(--blue);background:rgba(111,195,223,0.1);border-color:rgba(111,195,223,0.2)">✓ CAPTURED</div>
+            <div class="method-label" id="child-method"></div>
+            <div class="ref-label" id="child-ref"></div>
+          </div>
+          <button class="rescan-btn" id="child-rescan" style="display:none"
+            onclick="event.stopPropagation(); openModal('child')">RE-SCAN</button>
+        </div>
+
+      </div>
+
+      <!-- Connector -->
+      <div class="connector">
+        <div class="conn-line" id="conn-left"></div>
+        <div class="conn-badge" id="conn-badge">SCAN BOTH SUBJECTS</div>
+        <div class="conn-line" id="conn-right"></div>
+      </div>
+
+      <!-- Analyze button -->
+      <button id="analyze-btn" onclick="runAnalysis()">◈&nbsp;&nbsp;RUN DNA ANALYSIS</button>
+
+      <!-- Analysis steps progress -->
+      <div id="analysis-steps">
+        <div class="astep" id="step-0"><span class="astep-icon">▸</span> Extracting ridge minutiae patterns</div>
+        <div class="astep" id="step-1"><span class="astep-icon">▸</span> Mapping Short Tandem Repeat loci</div>
+        <div class="astep" id="step-2"><span class="astep-icon">▸</span> Computing allele frequency tables</div>
+        <div class="astep" id="step-3"><span class="astep-icon">▸</span> Calculating Combined Paternity Index</div>
+        <div class="astep" id="step-4"><span class="astep-icon">▸</span> Generating certified forensic report</div>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <div class="info-title">SUPPORTED INPUT METHODS</div>
+        <div>◉&nbsp; Phone Biometric — Touch ID · Face ID · Device Fingerprint Sensor</div>
+        <div>⇧&nbsp; Upload Image — Scanned ink print, PNG / JPG file</div>
+        <div>✎&nbsp; Draw on Screen — Trace directly with finger or stylus</div>
+        <div>⟳&nbsp; Simulate — Auto-generated algorithmic fingerprint</div>
+      </div>
+    </div>
+
+    <!-- RESULT SECTION -->
+    <div id="result-section">
+      <div class="report-header">
+        <div>
+          <div class="report-case">FORENSIC REPORT</div>
+          <div class="report-id" id="rpt-case"></div>
+        </div>
+        <div class="report-ts" id="rpt-ts"></div>
+      </div>
+      <div class="verdict-box" id="verdict-box">
+        <div class="verdict-icon" id="verdict-icon"></div>
+        <div class="verdict-title" id="verdict-title"></div>
+        <div class="verdict-sub"   id="verdict-sub"></div>
+      </div>
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="str-table">
+        <div class="str-thead">
+          <span>LOCUS</span><span>FATHER</span><span>CHILD</span><span>MATCH</span><span>PI VALUE</span>
+        </div>
+        <div id="str-rows"></div>
+      </div>
+      <div class="lab-note">
+        <div class="lab-note-title">LABORATORY INTERPRETATION</div>
+        <div id="lab-note-text"></div>
+        <div style="margin-top:6px;color:var(--muted-lt)">
+          YSF Genomic Laboratory · ISO/IEC 17025 Accredited · This report is for demonstration only.
+        </div>
+      </div>
+      <button id="reset-btn" onclick="resetAll()">↺ &nbsp; NEW ANALYSIS</button>
+    </div>
+
+  </div><!-- /body -->
+
+  <div id="footer">
+    YSF GENOMIC LABORATORY &nbsp;·&nbsp; ISO/IEC 17025 ACCREDITED &nbsp;·&nbsp; FOR DEMONSTRATION PURPOSES ONLY
+  </div>
+
+</div><!-- /app -->
+
+<!-- ── MODAL ── -->
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Capture Fingerprint</div>
+        <div class="modal-sub" id="modal-sub">SUBJECT: —</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Method list -->
+    <div class="modal-section visible" id="sec-methods">
+      <div class="method-list">
+        <button class="method-btn" id="btn-biometric" onclick="startBiometric()">
+          <span class="method-icon" id="bio-icon">◉</span>
+          <div>
+            <div class="method-name">Phone Biometric</div>
+            <div class="method-desc">Touch ID · Face ID · Fingerprint Sensor</div>
+          </div>
+        </button>
+        <button class="method-btn" onclick="startUpload()">
+          <span class="method-icon" style="color:var(--gold)">⇧</span>
+          <div>
+            <div class="method-name">Upload Fingerprint Image</div>
+            <div class="method-desc">PNG, JPG, BMP — ink / scanned print</div>
+          </div>
+        </button>
+        <button class="method-btn" onclick="showSection('sec-draw')">
+          <span class="method-icon" style="color:var(--gold)">✎</span>
+          <div>
+            <div class="method-name">Draw on Screen</div>
+            <div class="method-desc">Trace fingerprint with finger or stylus</div>
+          </div>
+        </button>
+        <button class="method-btn" onclick="simulateFP()">
+          <span class="method-icon" style="color:var(--gold)">⟳</span>
+          <div>
+            <div class="method-name">Simulate / Demo</div>
+            <div class="method-desc">Generate a realistic test fingerprint</div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Biometric -->
+    <div class="modal-section" id="sec-biometric">
+      <div class="biometric-icon">👆</div>
+      <div class="biometric-status" id="bio-status" style="color:var(--gold)">WAITING FOR BIOMETRIC…</div>
+      <div class="biometric-hint">Place your finger on the sensor or follow your device's prompt.</div>
+      <button class="ghost-btn back" onclick="showSection('sec-methods')" style="margin-top:16px">← TRY ANOTHER METHOD</button>
+    </div>
+
+    <!-- Biometric error -->
+    <div class="modal-section" id="sec-bio-error">
+      <div class="error-icon">⚠</div>
+      <div class="error-text" id="bio-error-text"></div>
+      <button class="ghost-btn" onclick="showSection('sec-methods')">← TRY ANOTHER METHOD</button>
+    </div>
+
+    <!-- Draw -->
+    <div class="modal-section" id="sec-draw">
+      <canvas id="draw-canvas" width="240" height="220"></canvas>
+      <div class="draw-btns">
+        <button class="ghost-btn" onclick="clearDraw()">CLEAR</button>
+        <button class="ghost-btn accent" onclick="useDraw()">USE THIS</button>
+      </div>
+      <button class="ghost-btn back" onclick="showSection('sec-methods')">← BACK</button>
+    </div>
+
+    <!-- Upload -->
+    <div class="modal-section" id="sec-upload">
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">
+          SELECT A FINGERPRINT IMAGE FILE
+        </div>
+        <button class="ghost-btn accent" onclick="document.getElementById('file-input').click()">BROWSE FILES</button>
+        <div style="margin-top:12px">
+          <button class="ghost-btn" onclick="showSection('sec-methods')">← BACK</button>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)"/>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   YSF DNA MATCH — VANILLA JS ENGINE
+════════════════════════════════════════════════════════════ */
+
+/* ── STATE ── */
+const STATE = { father: null, child: null, currentSubject: null };
+
+/* ── INIT ── */
+(function init() {
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const id  = 'YSF-' + yr + '-' + String(Math.floor(Math.random()*99999)).padStart(5,'0');
+  document.getElementById('case-id').textContent = id;
+  document.getElementById('rpt-case').textContent = 'Case: ' + id;
+  const ts = now.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('timestamp').textContent = ts;
+  document.getElementById('rpt-ts').textContent = ts;
+  drawEmptyCanvas('father-canvas', '#2e3248');
+  drawEmptyCanvas('child-canvas',  '#2e3248');
+})();
+
+/* ── RNG ── */
+function rng32(seed) {
+  let s = (seed >>> 0) || 1;
+  return function() {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ── FINGERPRINT RENDERER ── */
+function renderFP(canvasId, seed, color, progress) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H*0.52;
+  ctx.clearRect(0,0,W,H);
+  const rand = rng32(seed);
+
+  ctx.fillStyle = '#22253a';
+  ctx.fillRect(0,0,W,H);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);
+  ctx.clip();
+
+  const totalRidges = 22 + Math.floor(rand()*8);
+  const whorls      = Math.floor(rand()*3);
+  const dcx = cx + (rand()-0.5)*W*0.15;
+  const dcy = cy + (rand()-0.5)*H*0.15;
+
+  for (let i=0; i<totalRidges; i++) {
+    const rev = Math.min(1, progress*(totalRidges+4)-i);
+    if (rev <= 0) continue;
+    const t    = i/totalRidges;
+    const r    = W*0.07 + t*W*0.36;
+    const wx   = (rand()-0.5)*W*0.06;
+    const wy   = (rand()-0.5)*H*0.06;
+    let sa, sp;
+    if      (whorls===2) { sa = rand()*Math.PI*2;              sp = Math.PI*(1.4+rand()*0.5); }
+    else if (whorls===1) { sa = -Math.PI*0.3+(rand()-0.5)*0.6; sp = Math.PI*(1.0+rand()*0.8); }
+    else                 { sa = Math.PI*0.15+rand()*0.4;        sp = Math.PI*(0.7+rand()*0.5); }
+    const alpha = rev*(0.45+t*0.55);
+    const h2    = Math.round(alpha*255).toString(16).padStart(2,'0');
+    ctx.beginPath();
+    ctx.arc(dcx+wx*(1-t), dcy+wy*(1-t), r, sa, sa+sp);
+    ctx.strokeStyle = color+h2;
+    ctx.lineWidth   = 0.9+rand()*0.9;
+    ctx.stroke();
+    if (rand()>0.62) {
+      const a  = sa+rand()*sp;
+      const px = dcx+wx*(1-t)+r*Math.cos(a);
+      const py = dcy+wy*(1-t)+r*Math.sin(a);
+      ctx.beginPath();
+      ctx.arc(px,py,1.4,0,Math.PI*2);
+      ctx.fillStyle = color+Math.round(alpha*0.7*255).toString(16).padStart(2,'0');
+      ctx.fill();
+    }
+  }
+  for (let k=0;k<5;k++) {
+    const kr = 3+k*2.5;
+    const ka = Math.min(1, progress*2);
+    ctx.beginPath();
+    ctx.ellipse(dcx+(rand()-0.5)*3, dcy+(rand()-0.5)*3, kr*1.2, kr, (rand()-0.5)*0.4, 0, Math.PI*2);
+    ctx.strokeStyle = color+Math.round(ka*160).toString(16).padStart(2,'0');
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.beginPath();
+  ctx.ellipse(cx,cy,W*0.44,H*0.47,0,0,Math.PI*2);
+  ctx.strokeStyle = color+'55';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function drawEmptyCanvas(id, borderColor) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#22253a';
+  ctx.fillRect(0,0,W,H);
+  ctx.beginPath();
+  ctx.ellipse(W/2,H*0.52,W*0.44,H*0.47,0,0,Math.PI*2);
+  ctx.strokeStyle=borderColor;
+  ctx.lineWidth=1.5;
+  ctx.setLineDash([6,4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+/* ── ANIMATE FINGERPRINT SCAN ── */
+function animateFP(subject, seed) {
+  const canvasId = subject+'-canvas';
+  const barId    = subject+'-scanbar';
+  const color    = subject==='father' ? '#c9a84c' : '#6fc3df';
+  const bar      = document.getElementById(barId);
+  bar.style.display = 'block';
+  let p = 0;
+  const iv = setInterval(function() {
+    p = Math.min(p+0.035, 1);
+    renderFP(canvasId, seed, color, p);
+    if (p>=1) { clearInterval(iv); bar.style.display='none'; }
+  }, 30);
+}
+
+/* ── TILE UI UPDATE ── */
+function updateTileUI(subject) {
+  const data    = STATE[subject];
+  const isF     = subject==='father';
+  const color   = isF ? '#c9a84c' : '#6fc3df';
+  const tile    = document.getElementById(subject+'-tile');
+  const dot     = document.getElementById(subject+'-dot');
+  const lbl     = document.getElementById(subject+'-label');
+  const hint    = document.getElementById(subject+'-hint');
+  const status  = document.getElementById(subject+'-status');
+  const rescan  = document.getElementById(subject+'-rescan');
+  const meth    = document.getElementById(subject+'-method');
+  const ref     = document.getElementById(subject+'-ref');
+
+  if (data) {
+    tile.classList.add('has-data');
+    tile.style.borderColor = color+'44';
+    dot.style.background = color;
+    dot.style.boxShadow  = '0 0 8px '+color;
+    lbl.style.color = color;
+    hint.style.display   = 'none';
+    status.style.display = 'block';
+    rescan.style.display = 'block';
+    const methodMap = {biometric:'BIOMETRIC',upload:'IMAGE UPLOAD',draw:'DRAWN',simulate:'SIMULATED'};
+    meth.textContent = methodMap[data.method] || 'SCANNED';
+    ref.textContent  = 'REF: '+String(data.seed).slice(0,6)+'…';
+  } else {
+    tile.classList.remove('has-data');
+    tile.style.borderColor = '';
+    dot.style.background = '#2e3248';
+    dot.style.boxShadow  = '';
+    lbl.style.color = '';
+    hint.style.display   = 'flex';
+    status.style.display = 'none';
+    rescan.style.display = 'none';
+    drawEmptyCanvas(subject+'-canvas', '#2e3248');
+  }
+  updateConnector();
+}
+
+function updateConnector() {
+  const f  = !!STATE.father, c = !!STATE.child;
+  const badge = document.getElementById('conn-badge');
+  const btnA  = document.getElementById('analyze-btn');
+  const cl    = document.getElementById('conn-left');
+  const cr    = document.getElementById('conn-right');
+  badge.textContent = (f&&c) ? 'READY TO ANALYZE' : f ? 'CHILD PENDING' : c ? 'FATHER PENDING' : 'SCAN BOTH SUBJECTS';
+  badge.className   = 'conn-badge' + ((f&&c)?' ready':'');
+  cl.style.background = f ? 'linear-gradient(90deg,rgba(201,168,76,0.3),#c9a84c)' : '#2e3248';
+  cr.style.background = c ? 'linear-gradient(90deg,#6fc3df,rgba(111,195,223,0.3))' : '#2e3248';
+  if (f&&c) {
+    btnA.classList.add('ready');
+  } else {
+    btnA.classList.remove('ready');
+  }
+}
+
+/* ── MODAL ── */
+function openModal(subject) {
+  STATE.currentSubject = subject;
+  document.getElementById('modal-sub').textContent = 'SUBJECT: '+subject.toUpperCase();
+  const color = subject==='father' ? '#c9a84c' : '#6fc3df';
+  document.getElementById('bio-icon').style.color = color;
+  document.querySelectorAll('.method-btn').forEach(function(b) {
+    b.onmouseenter = function() { b.style.borderColor=color+'66'; b.style.background='#12131a'; };
+    b.onmouseleave = function() { b.style.borderColor='#2e3248'; b.style.background='#22253a'; };
+  });
+  showSection('sec-methods');
+  document.getElementById('modal-overlay').classList.add('open');
+  initDrawCanvas(color);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function showSection(id) {
+  document.querySelectorAll('.modal-section').forEach(function(s) { s.classList.remove('visible'); });
+  document.getElementById(id).classList.add('visible');
+}
+
+/* ── BIOMETRIC ── */
+async function startBiometric() {
+  showSection('sec-biometric');
+  document.getElementById('bio-status').textContent = 'Initializing biometric sensor…';
+  try {
+    if (!window.PublicKeyCredential) throw {message:'WebAuthn not supported on this device.'};
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId    = crypto.getRandomValues(new Uint8Array(16));
+    const label     = STATE.currentSubject==='father' ? 'Father' : 'Child';
+
+    async function tryCreate(includeId) {
+      const rp = includeId
+        ? { name:'YSF DNA Lab', id: window.location.hostname }
+        : { name:'YSF DNA Lab' };
+      return navigator.credentials.create({ publicKey:{
+        challenge, rp,
+        user:{ id:userId, name:label, displayName:label },
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+        timeout:60000, attestation:'none',
+      }});
+    }
+
+    let cred;
+    try { cred = await tryCreate(true); }
+    catch(e) {
+      if (e.name==='NotAllowedError'||e.name==='AbortError') throw e;
+      cred = await tryCreate(false);
+    }
+    const rawId = new Uint8Array(cred.rawId);
+    let hash = 0;
+    rawId.forEach(function(b,i){ hash=((hash<<5)-hash+b*(i+1))|0; });
+    const seed = Math.abs(hash)||42;
+    document.getElementById('bio-status').textContent = 'Biometric captured successfully.';
+    setTimeout(function(){ captureSubject(seed,'biometric'); }, 600);
+  } catch(e) {
+    let msg = e.message || 'Biometric capture failed.';
+    if (e.name==='NotAllowedError') msg = 'Permission denied or cancelled.';
+    else if (e.name==='NotSupportedError'||msg.toLowerCase().includes('not supported'))
+      msg = 'Biometric not available on this device. Try another method.';
+    document.getElementById('bio-error-text').textContent = msg;
+    showSection('sec-bio-error');
+  }
+}
+
+/* ── UPLOAD ── */
+function startUpload() {
+  showSection('sec-upload');
+  document.getElementById('file-input').value='';
+}
+
+function handleUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function() {
+    const bytes = new Uint8Array(reader.result);
+    let hash = 0;
+    bytes.forEach(function(b,i){ hash=((hash<<5)-hash+b*(i+1))|0; });
+    captureSubject(Math.abs(hash)||55, 'upload');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ── DRAW ── */
+let drawCtx=null, drawActive=false, drawLast=null, drawPoints=[];
+
+function initDrawCanvas(color) {
+  const c = document.getElementById('draw-canvas');
+  drawCtx = c.getContext('2d');
+  clearDraw();
+  c.onmousedown  = function(e){ e.preventDefault(); drawActive=true; drawLast=getDrawPos(e,c); drawPoints.push(drawLast); };
+  c.onmousemove  = function(e){ if(!drawActive)return; e.preventDefault(); doDrawMove(e,c,color); };
+  c.onmouseup    = function(){ drawActive=false; drawLast=null; };
+  c.onmouseleave = function(){ drawActive=false; drawLast=null; };
+  c.ontouchstart = function(e){ e.preventDefault(); drawActive=true; drawLast=getDrawPos(e,c); drawPoints.push(drawLast); };
+  c.ontouchmove  = function(e){ if(!drawActive)return; e.preventDefault(); doDrawMove(e,c,color); };
+  c.ontouchend   = function(){ drawActive=false; drawLast=null; };
+}
+
+function getDrawPos(e,canvas) {
+  const rect=canvas.getBoundingClientRect();
+  const src=e.touches?e.touches[0]:e;
+  return {
+    x:(src.clientX-rect.left)*(canvas.width/rect.width),
+    y:(src.clientY-rect.top)*(canvas.height/rect.height)
+  };
+}
+
+function doDrawMove(e,canvas,color) {
+  const pos = getDrawPos(e,canvas);
+  if (drawLast) {
+    drawCtx.beginPath();
+    drawCtx.moveTo(drawLast.x, drawLast.y);
+    drawCtx.lineTo(pos.x, pos.y);
+    drawCtx.strokeStyle = color+'cc';
+    drawCtx.lineWidth=2; drawCtx.lineCap='round'; drawCtx.lineJoin='round';
+    drawCtx.stroke();
+  }
+  drawLast = pos;
+  drawPoints.push(pos);
+}
+
+function clearDraw() {
+  const c=document.getElementById('draw-canvas');
+  drawPoints=[];
+  drawCtx.fillStyle='#22253a';
+  drawCtx.fillRect(0,0,c.width,c.height);
+  drawCtx.fillStyle='#6b7094';
+  drawCtx.font="10px 'IBM Plex Mono'";
+  drawCtx.textAlign='center';
+  drawCtx.fillText('DRAW FINGERPRINT HERE',c.width/2,c.height/2-10);
+  drawCtx.fillText('(USE FINGER OR STYLUS)',c.width/2,c.height/2+10);
+}
+
+function useDraw() {
+  if (drawPoints.length<20) { alert('Please draw more of the fingerprint first.'); return; }
+  let hash=0;
+  drawPoints.forEach(function(p,i){ hash=((hash+Math.round(p.x*100+p.y*100)*(i+1))|0); });
+  captureSubject(Math.abs(hash)||77, 'draw');
+}
+
+/* ── SIMULATE ── */
+function simulateFP() {
+  captureSubject(Math.floor(Math.random()*999999)+1, 'simulate');
+}
+
+/* ── CAPTURE ── */
+function captureSubject(seed, method) {
+  const subj = STATE.currentSubject;
+  STATE[subj] = { seed, method };
+  closeModal();
+  animateFP(subj, seed);
+  updateTileUI(subj);
+}
+
+/* ── ANALYSIS ── */
+const STR_LOCI = ['D3S1358','vWA','D16S539','CSF1PO','TPOX','D8S1179','D21S11','D18S51','D13S317','D7S820'];
+
+function computePaternity(fSeed, cSeed) {
+  const rf = rng32(fSeed*31337), rc = rng32(cSeed*31337);
+  const markers = STR_LOCI.map(function(name) {
+    const fa1=10+Math.floor(rf()*12), fa2=10+Math.floor(rf()*12);
+    const ca1=10+Math.floor(rc()*12), ca2=10+Math.floor(rc()*12);
+    const shared=(ca1===fa1||ca1===fa2||ca2===fa1||ca2===fa2);
+    const pi=shared?(2.0+rf()*8.0):(0.02+rf()*0.25);
+    return {name,fa:[fa1,fa2],ca:[ca1,ca2],shared,pi};
+  });
+  const CPI = markers.reduce(function(a,m){ return a*m.pi; },1);
+  const PP  = (CPI/(CPI+1))*100;
+  return { markers, CPI, PP, excluded: PP<99.0 };
+}
+
+function runAnalysis() {
+  if (!STATE.father||!STATE.child) return;
+  const btn = document.getElementById('analyze-btn');
+  btn.classList.remove('ready');
+  btn.innerHTML = '<div class="spinner"></div> ANALYZING DNA MARKERS…';
+  btn.disabled = true;
+
+  const steps = document.getElementById('analysis-steps');
+  steps.style.display='block';
+  for (let i=0;i<5;i++) {
+    const el=document.getElementById('step-'+i);
+    el.className='astep';
+    el.querySelector('.astep-icon').textContent='▸';
+  }
+
+  let active=0;
+  const iv = setInterval(function() {
+    if (active>0) {
+      const prev=document.getElementById('step-'+(active-1));
+      prev.classList.remove('active'); prev.classList.add('done');
+      prev.querySelector('.astep-icon').textContent='✓';
+    }
+    if (active<5) {
+      const cur=document.getElementById('step-'+active);
+      cur.classList.add('active');
+    }
+    active++;
+    if (active>5) clearInterval(iv);
+  }, 480);
+
+  setTimeout(function() {
+    const result = computePaternity(STATE.father.seed, STATE.child.seed);
+    steps.style.display='none';
+    btn.innerHTML='◈&nbsp;&nbsp;RUN DNA ANALYSIS';
+    btn.disabled=false;
+    showResult(result);
+  }, 2700);
+}
+
+/* ── RESULT ── */
+function showResult(result) {
+  document.getElementById('capture-section').style.display='none';
+  const rs = document.getElementById('result-section');
+  rs.classList.add('visible');
+
+  const match = !result.excluded;
+  const color = match ? '#3ddc84' : '#e05c6a';
+  const vbox  = document.getElementById('verdict-box');
+  vbox.className = 'verdict-box ' + (match?'match':'nomatch');
+  document.getElementById('verdict-icon').textContent  = match?'✓':'✗';
+  document.getElementById('verdict-title').textContent = match?'Paternity Confirmed':'Paternity Excluded';
+  document.getElementById('verdict-sub').textContent   = match
+    ? 'BIOLOGICAL RELATIONSHIP ESTABLISHED WITH HIGH CERTAINTY'
+    : 'GENETIC MARKERS ARE INCONSISTENT — PATERNITY EXCLUDED';
+
+  const cpiStr = result.CPI>999999?'>999,999':result.CPI>9999?result.CPI.toFixed(0):result.CPI.toFixed(1);
+  const shared = result.markers.filter(function(m){return m.shared;}).length;
+  const grid   = document.getElementById('stats-grid');
+  grid.innerHTML = [
+    {label:'PATERNITY INDEX',value:cpiStr,      unit:'PI'},
+    {label:'PROBABILITY',    value:result.PP.toFixed(3)+'%', unit:'PP'},
+    {label:'LOCI TESTED',    value:result.markers.length, unit:'STR LOCI'},
+    {label:'LOCI CONCORDANT',value:shared,      unit:'SHARED'},
+  ].map(function(s){
+    return '<div class="stat-card"><div class="stat-label">'+s.label+'</div>'
+      +'<div class="stat-value">'+s.value+'</div>'
+      +'<div class="stat-unit">'+s.unit+'</div></div>';
+  }).join('');
+
+  const rows = document.getElementById('str-rows');
+  rows.innerHTML = result.markers.map(function(m,i){
+    const cls = m.shared?'yes':'no';
+    return '<div class="str-row" style="animation-delay:'+(i*0.04)+'s">'
+      +'<span class="str-locus">'+m.name+'</span>'
+      +'<span class="str-allele">'+m.fa[0]+','+m.fa[1]+'</span>'
+      +'<span class="str-allele">'+m.ca[0]+','+m.ca[1]+'</span>'
+      +'<span class="str-match '+cls+'">'+(m.shared?'●':'○')+'</span>'
+      +'<span class="str-pi '+cls+'">'+m.pi.toFixed(3)+'</span>'
+      +'</div>';
+  }).join('');
+
+  document.getElementById('lab-note-text').textContent =
+    'Analysis performed using Short Tandem Repeat (STR) profiling across '
+    +result.markers.length+' CODIS-core loci. '
+    +'Inclusion threshold: Combined Paternity Index (CPI) ≥ 100 and Probability of Paternity ≥ 99.000%.';
+
+  // Update step tabs
+  document.getElementById('tab-1').classList.remove('active');
+  document.getElementById('tab-2').classList.remove('active');
+  document.getElementById('tab-3').classList.add('active');
+}
+
+function resetAll() {
+  STATE.father=null; STATE.child=null;
+  drawEmptyCanvas('father-canvas','#2e3248');
+  drawEmptyCanvas('child-canvas', '#2e3248');
+  updateTileUI('father'); updateTileUI('child');
+  document.getElementById('result-section').classList.remove('visible');
+  document.getElementById('capture-section').style.display='block';
+  document.getElementById('tab-1').classList.add('active');
+  document.getElementById('tab-3').classList.remove('active');
+  document.getElementById('analyze-btn').innerHTML='◈&nbsp;&nbsp;RUN DNA ANALYSIS';
+  document.getElementById('analyze-btn').disabled=false;
+}
+</script>
+</body>
+</html>
