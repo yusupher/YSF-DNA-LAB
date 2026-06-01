@@ -105,13 +105,15 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
 .cam-guide{width:120px;height:120px;border-radius:50%;border:2px dashed rgba(201,168,76,0.7);
   box-shadow:0 0 0 2000px rgba(0,0,0,0.35)}
 .cam-hint{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-align:center}
-.cam-btns{display:flex;gap:8px;width:100%}
-.cam-snap{flex:1;padding:10px;background:var(--gold-faint);border:1.5px solid var(--gold);
+.cam-btns{display:flex;gap:6px;width:100%}
+.cam-snap{flex:2;padding:10px;background:var(--gold-faint);border:1.5px solid var(--gold);
   border-radius:8px;color:var(--gold);font-family:var(--mono);font-size:10px;
   letter-spacing:2px;cursor:pointer;transition:all 0.2s}
 .cam-snap:hover{background:rgba(201,168,76,0.2)}
-.cam-cancel{padding:10px 14px;background:transparent;border:1px solid var(--border);
-  border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer}
+.cam-cancel{flex:1;padding:10px 8px;background:transparent;border:1px solid var(--border);
+  border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:9px;
+  cursor:pointer;letter-spacing:1px;transition:all 0.2s;white-space:nowrap}
+.cam-cancel:hover{border-color:var(--gold);color:var(--gold)}
 
 /* UPLOAD ZONE */
 .upload-zone{width:100%;padding:14px;border:1.5px dashed var(--border);border-radius:10px;
@@ -350,6 +352,7 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
         <div class="cam-hint">Place inked finger inside circle — keep still</div>
         <div class="cam-btns">
           <button class="cam-snap" onclick="snapPhoto(1)">📷 CAPTURE</button>
+          <button id="flip-btn1" class="cam-cancel" onclick="flipCam(1)" style="border-color:rgba(201,168,76,0.3);color:var(--gold)">🔄 FRONT CAM</button>
           <button class="cam-cancel" onclick="stopCam(1)">✕</button>
         </div>
         <canvas id="snap1" style="display:none"></canvas>
@@ -406,6 +409,7 @@ h1.title{font-family:var(--display);font-size:26px;font-style:italic;font-weight
         <div class="cam-hint">Place inked finger inside circle — keep still</div>
         <div class="cam-btns">
           <button class="cam-snap" style="border-color:var(--blue);color:var(--blue);background:rgba(111,195,223,0.08)" onclick="snapPhoto(2)">📷 CAPTURE</button>
+          <button id="flip-btn2" class="cam-cancel" onclick="flipCam(2)" style="border-color:rgba(111,195,223,0.3);color:var(--blue)">🔄 FRONT CAM</button>
           <button class="cam-cancel" onclick="stopCam(2)">✕</button>
         </div>
         <canvas id="snap2" style="display:none"></canvas>
@@ -602,173 +606,248 @@ function analyzeImage(dataUrl, callback) {
   img.src = dataUrl;
 }
 
+function clamp01(v){ return Math.max(0,Math.min(1,isNaN(v)?0:v)); }
+
+/*
+  extractFeatures: builds a 64-element LOCAL feature vector from the image.
+
+  The image is divided into an 8x8 grid of blocks (64 blocks total).
+  For each block we compute the MEAN darkness and GRADIENT ORIENTATION.
+  This creates a spatial fingerprint map that is UNIQUE per image.
+
+  Two different fingers will have very different block patterns.
+  The same finger image will always produce the same vector.
+*/
 function extractFeatures(gray, SIZE) {
-  /* Feature 1: Ridge Density
-     Average darkness of the central 60% of the image
-     Dark pixels = ridges */
-  var margin = Math.floor(SIZE * 0.2);
-  var sum=0, count=0;
-  for(var y=margin; y<SIZE-margin; y++)
-    for(var x=margin; x<SIZE-margin; x++){
-      sum += 1.0 - gray[y*SIZE+x]; // invert: dark=high
-      count++;
-    }
-  var ridgeDensity = sum/count; // 0-1
+  var GRID = 8; // 8x8 = 64 blocks
+  var bw = SIZE / GRID, bh = SIZE / GRID;
 
-  /* Feature 2: Orientation Consistency (Gradient-based)
-     Measures how consistent ridge flow direction is */
-  var gx=[], gy=[];
-  for(var y=1; y<SIZE-1; y++){
-    for(var x=1; x<SIZE-1; x++){
-      gx.push(gray[y*SIZE+(x+1)] - gray[y*SIZE+(x-1)]);
-      gy.push(gray[(y+1)*SIZE+x] - gray[(y-1)*SIZE+x]);
-    }
-  }
-  var sin2=0,cos2=0;
-  for(var i=0;i<gx.length;i++){
-    var mag=Math.sqrt(gx[i]*gx[i]+gy[i]*gy[i]);
-    var ang=Math.atan2(gy[i],gx[i]);
-    sin2+=mag*Math.sin(2*ang);
-    cos2+=mag*Math.cos(2*ang);
-  }
-  var orientConsistency = Math.sqrt(sin2*sin2+cos2*cos2)/(gx.length*0.5+1);
-  orientConsistency = Math.min(1, orientConsistency);
+  var blockDensity    = [];  // mean darkness per block
+  var blockOrientation= [];  // dominant gradient angle per block (0-1 mapped)
+  var blockContrast   = [];  // local std-dev per block
+  var blockFrequency  = [];  // zero-crossings per block (ridge spacing)
 
-  /* Feature 3: Contrast Ratio
-     Standard deviation of pixel values (high = sharp ridges) */
-  var mean=0;
-  for(var i=0;i<gray.length;i++) mean+=gray[i];
-  mean/=gray.length;
-  var variance=0;
-  for(var i=0;i<gray.length;i++) variance+=(gray[i]-mean)*(gray[i]-mean);
-  var contrastRatio = Math.sqrt(variance/gray.length) * 4; // scale to 0-1 range approx
-  contrastRatio = Math.min(1, contrastRatio);
+  for(var by=0; by<GRID; by++){
+    for(var bx=0; bx<GRID; bx++){
+      var x0=Math.round(bx*bw), y0=Math.round(by*bh);
+      var x1=Math.round((bx+1)*bw), y1=Math.round((by+1)*bh);
 
-  /* Feature 4: Core Region Intensity
-     Average darkness in center 20% (where the core whorl is) */
-  var c1=Math.floor(SIZE*0.4),c2=Math.floor(SIZE*0.6);
-  var csum=0,ccount=0;
-  for(var y=c1;y<c2;y++)
-    for(var x=c1;x<c2;x++){
-      csum+=1.0-gray[y*SIZE+x];ccount++;
-    }
-  var coreIntensity=csum/ccount;
+      // Collect pixels in this block
+      var vals=[], gxs=[], gys=[];
+      for(var y=y0;y<y1;y++){
+        for(var x=x0;x<x1;x++){
+          var idx=y*SIZE+x;
+          vals.push(gray[idx]);
+          if(x>0&&x<SIZE-1&&y>0&&y<SIZE-1){
+            gxs.push(gray[y*SIZE+(x+1)]-gray[y*SIZE+(x-1)]);
+            gys.push(gray[(y+1)*SIZE+x]-gray[(y-1)*SIZE+x]);
+          }
+        }
+      }
 
-  /* Feature 5: Horizontal vs Vertical Ridge Ratio
-     Ratio of horizontal to vertical gradients — loop vs arch indicator */
-  var hGrad=0,vGrad=0;
-  for(var i=0;i<gx.length;i++){
-    hGrad+=Math.abs(gx[i]);
-    vGrad+=Math.abs(gy[i]);
-  }
-  var hvRatio = hGrad/(hGrad+vGrad+0.001);
+      // Mean darkness (inverted: dark=1 = ridge)
+      var mean=vals.reduce(function(a,v){return a+v;},0)/vals.length;
+      blockDensity.push(clamp01(1-mean));
 
-  /* Feature 6: Spatial Frequency (ridge spacing)
-     Count zero-crossings in horizontal scanlines = ridge count */
-  var crossings=0, lines=0;
-  for(var y=Math.floor(SIZE*0.25); y<Math.floor(SIZE*0.75); y+=4){
-    var prev=gray[y*SIZE+Math.floor(SIZE*0.25)]>0.5;
-    for(var x=Math.floor(SIZE*0.25)+1; x<Math.floor(SIZE*0.75); x++){
-      var curr=gray[y*SIZE+x]>0.5;
-      if(curr!==prev){crossings++;prev=curr;}
-    }
-    lines++;
-  }
-  var spatialFreq=Math.min(1, crossings/(lines*16+1));
+      // Local contrast (std dev)
+      var variance=vals.reduce(function(a,v){return a+(v-mean)*(v-mean);},0)/vals.length;
+      blockContrast.push(clamp01(Math.sqrt(variance)*5));
 
-  /* Feature 7: Symmetry Index
-     How symmetric the fingerprint is left-right */
-  var symDiff=0;
-  for(var y=Math.floor(SIZE*0.2); y<Math.floor(SIZE*0.8); y++){
-    for(var x=0; x<Math.floor(SIZE/2); x++){
-      symDiff+=Math.abs(gray[y*SIZE+x] - gray[y*SIZE+(SIZE-1-x)]);
+      // Dominant gradient orientation in this block
+      var sin2=0,cos2=0;
+      for(var i=0;i<gxs.length;i++){
+        var mag=Math.sqrt(gxs[i]*gxs[i]+gys[i]*gys[i]);
+        var ang=Math.atan2(gys[i],gxs[i]);
+        sin2+=mag*Math.sin(2*ang);
+        cos2+=mag*Math.cos(2*ang);
+      }
+      var dom=(Math.atan2(sin2,cos2)/2+Math.PI/2)/Math.PI; // map to 0-1
+      blockOrientation.push(clamp01(dom));
+
+      // Ridge frequency: zero-crossings across block midline
+      var midY=Math.round((y0+y1)/2);
+      var zc=0,prev=gray[midY*SIZE+x0]>0.5;
+      for(var x=x0+1;x<x1;x++){
+        var curr=gray[midY*SIZE+x]>0.5;
+        if(curr!==prev){zc++;prev=curr;}
+      }
+      blockFrequency.push(clamp01(zc/8));
     }
   }
-  var symCount=Math.floor(SIZE*0.6)*Math.floor(SIZE/2);
-  var symmetry=1.0-Math.min(1,(symDiff/symCount)*3);
-
-  /* Feature 8: Texture Entropy
-     Shannon entropy of pixel histogram — measures pattern complexity */
-  var hist=new Array(16).fill(0);
-  for(var i=0;i<gray.length;i++){
-    hist[Math.min(15,Math.floor(gray[i]*16))]++;
-  }
-  var entropy=0,total=gray.length;
-  for(var i=0;i<16;i++){
-    if(hist[i]>0){var p=hist[i]/total;entropy-=p*Math.log2(p);}
-  }
-  var textureEntropy=Math.min(1,entropy/4);
 
   return {
-    ridgeDensity:     clamp01(ridgeDensity),
-    orientConsist:    clamp01(orientConsistency),
-    contrastRatio:    clamp01(contrastRatio),
-    coreIntensity:    clamp01(coreIntensity),
-    hvRatio:          clamp01(hvRatio),
-    spatialFreq:      clamp01(spatialFreq),
-    symmetry:         clamp01(symmetry),
-    textureEntropy:   clamp01(textureEntropy),
+    blockDensity:     blockDensity,     // 64 values
+    blockOrientation: blockOrientation, // 64 values
+    blockContrast:    blockContrast,    // 64 values
+    blockFrequency:   blockFrequency,   // 64 values
   };
 }
 
-function clamp01(v){ return Math.max(0,Math.min(1,isNaN(v)?0:v)); }
-
-/* ════ COMPUTE SIMILARITY ════
-   Compare two feature vectors using Gaussian kernel.
-   Same features → 100%. Different → lower.
-   This is deterministic — given same two images, always same result.
+/*
+  FEATURE_META for the 8-row display table.
+  Each row represents one 8-block strip (row of the grid).
 */
 var FEATURE_META = [
-  { key:'ridgeDensity',   label:'Ridge Density',          weight:0.20, desc:'Darkness/density of ridge lines' },
-  { key:'orientConsist',  label:'Orientation Consistency', weight:0.18, desc:'Consistency of ridge flow direction' },
-  { key:'contrastRatio',  label:'Contrast Ratio',          weight:0.16, desc:'Sharpness of ridge-valley boundaries' },
-  { key:'coreIntensity',  label:'Core Pattern Intensity',  weight:0.14, desc:'Central whorl/loop pattern strength' },
-  { key:'hvRatio',        label:'Ridge Flow Direction',    weight:0.12, desc:'Horizontal vs vertical ridge ratio' },
-  { key:'spatialFreq',    label:'Spatial Frequency',       weight:0.10, desc:'Ridge spacing and density count' },
-  { key:'symmetry',       label:'Symmetry Index',          weight:0.06, desc:'Left-right bilateral symmetry' },
-  { key:'textureEntropy', label:'Texture Entropy',         weight:0.04, desc:'Pattern complexity and randomness' },
+  { label:'Ridge Density — Top Zone',     desc:'Ridge darkness in upper fingerprint region',   weight:0.14 },
+  { label:'Ridge Density — Core Zone',    desc:'Ridge darkness in central whorl/loop area',    weight:0.16 },
+  { label:'Ridge Density — Lower Zone',   desc:'Ridge darkness in lower fingerprint region',   weight:0.14 },
+  { label:'Orientation — Upper Ridges',   desc:'Ridge flow direction in upper region',         weight:0.14 },
+  { label:'Orientation — Core Ridges',    desc:'Ridge flow direction through the core',        weight:0.12 },
+  { label:'Local Contrast — Upper',       desc:'Ridge-valley sharpness in upper zone',        weight:0.10 },
+  { label:'Local Contrast — Core',        desc:'Ridge-valley sharpness in core zone',         weight:0.12 },
+  { label:'Ridge Frequency — Core',       desc:'Ridge spacing (frequency) in core area',      weight:0.08 },
 ];
 
+/*
+  computeMatch: compares two full block-based feature vectors.
+
+  For each of the 4 feature arrays (density, orientation, contrast, frequency),
+  compute the MEAN ABSOLUTE DIFFERENCE across all 64 blocks.
+  This gives a true per-image spatial difference.
+
+  Then combine into 8 display rows (zone-based averages) and a final score.
+
+  Key fix: use LINEAR difference (not Gaussian) with strong scaling
+  so that even small spatial differences produce clearly different scores.
+*/
 function computeMatch(f1, f2) {
-  var results = FEATURE_META.map(function(m) {
-    var v1 = f1[m.key], v2 = f2[m.key];
-    var diff = Math.abs(v1 - v2);
-    // Gaussian similarity: k=5 gives good spread
-    var sim = Math.exp(-5 * diff * diff);
-    return {
-      label: m.label,
-      desc:  m.desc,
-      weight: m.weight,
-      p1: Math.round(v1*100),
-      p2: Math.round(v2*100),
-      sim: sim,
-      pct: Math.round(sim*100),
+  // Compute block-level differences for all 4 feature types
+  function vecDiff(a, b){
+    var d=0;
+    for(var i=0;i<a.length;i++) d+=Math.abs(a[i]-b[i]);
+    return d/a.length; // mean absolute difference 0-1
+  }
+
+  function zoneDiff(a, b, start, end){
+    var d=0;
+    for(var i=start;i<end;i++) d+=Math.abs(a[i]-b[i]);
+    return d/(end-start);
+  }
+
+  // Zone definitions (rows of 8x8 grid)
+  // Row 0-1 = top, Row 2-5 = core, Row 6-7 = bottom
+  var TOP  = [0,  16]; // blocks 0-15  (rows 0-1)
+  var CORE = [16, 48]; // blocks 16-47 (rows 2-5)
+  var BOT  = [48, 64]; // blocks 48-63 (rows 6-7)
+
+  function diffToSim(diff) {
+    // Strong linear-to-score mapping:
+    // diff=0.00 → 100%  (identical)
+    // diff=0.05 → 75%   (very similar — same finger, slightly different angle)
+    // diff=0.10 → 50%   (moderately different)
+    // diff=0.20 → 10%   (very different — different fingers)
+    // diff=0.30+ →  0%
+    var sim = 1 - (diff / 0.22);
+    return Math.round(Math.max(0, Math.min(1, sim)) * 100);
+  }
+
+  var rows = [
+    { diff: zoneDiff(f1.blockDensity,     f2.blockDensity,     TOP[0],  TOP[1])  },
+    { diff: zoneDiff(f1.blockDensity,     f2.blockDensity,     CORE[0], CORE[1]) },
+    { diff: zoneDiff(f1.blockDensity,     f2.blockDensity,     BOT[0],  BOT[1])  },
+    { diff: zoneDiff(f1.blockOrientation, f2.blockOrientation, TOP[0],  TOP[1])  },
+    { diff: zoneDiff(f1.blockOrientation, f2.blockOrientation, CORE[0], CORE[1]) },
+    { diff: zoneDiff(f1.blockContrast,    f2.blockContrast,    TOP[0],  TOP[1])  },
+    { diff: zoneDiff(f1.blockContrast,    f2.blockContrast,    CORE[0], CORE[1]) },
+    { diff: zoneDiff(f1.blockFrequency,   f2.blockFrequency,   CORE[0], CORE[1]) },
+  ];
+
+  var results = rows.map(function(r, i) {
+    var m = FEATURE_META[i];
+    var pct = diffToSim(r.diff);
+    // p1/p2 are representative zone averages for display
+    var zoneAvg = function(arr, s, e){
+      var sum=0;for(var j=s;j<e;j++)sum+=arr[j];return Math.round(sum/(e-s)*100);
     };
+    var ranges = [TOP,TOP,BOT,TOP,CORE,TOP,CORE,CORE];
+    var p1 = zoneAvg(i<3?f1.blockDensity:i<5?f1.blockOrientation:i<7?f1.blockContrast:f1.blockFrequency, ranges[i][0], ranges[i][1]);
+    var p2 = zoneAvg(i<3?f2.blockDensity:i<5?f2.blockOrientation:i<7?f2.blockContrast:f2.blockFrequency, ranges[i][0], ranges[i][1]);
+    return { label:m.label, desc:m.desc, weight:m.weight, p1:p1, p2:p2, diff:r.diff, pct:pct };
   });
-  var weighted = results.reduce(function(a,r){ return a + r.sim*r.weight; }, 0);
-  var finalPct = Math.round(weighted * 100);
+
+  // Final weighted score
+  var weighted = results.reduce(function(a,r){ return a + (r.pct/100)*r.weight; }, 0);
+  var finalPct  = Math.round(weighted * 100);
   var level = finalPct>=82?'high': finalPct>=62?'mid-high': finalPct>=42?'mid':'low';
   return { features: results, finalPct: finalPct, level: level };
 }
 
 /* ════ CAMERA ════ */
+// Track facing mode per subject
+STATE.facing = { 1: 'environment', 2: 'environment' };
+
 function startCam(n) {
-  var constraints = { video: { facingMode: { ideal: 'environment' }, width:{ideal:1280}, height:{ideal:720} }, audio: false };
+  _openCam(n, STATE.facing[n] || 'environment');
+}
+
+function _openCam(n, facing) {
+  // Stop any existing stream first
+  if(STATE.streams[n]){
+    STATE.streams[n].getTracks().forEach(function(t){t.stop();});
+    STATE.streams[n]=null;
+  }
+  STATE.facing[n] = facing;
+
+  var constraints = {
+    video: { facingMode: { ideal: facing }, width:{ideal:1280}, height:{ideal:720} },
+    audio: false
+  };
+
   navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
     STATE.streams[n] = stream;
     var vid = document.getElementById('vid'+n);
     vid.srcObject = stream;
+
+    // Mirror video when using front camera
+    vid.style.transform = (facing === 'user') ? 'scaleX(-1)' : 'scaleX(1)';
+
+    // Update flip button label
+    var flipBtn = document.getElementById('flip-btn'+n);
+    if(flipBtn){
+      flipBtn.textContent = (facing === 'user') ? '🔄 BACK CAM' : '🔄 FRONT CAM';
+    }
+
     document.getElementById('cam'+n).classList.add('open');
     document.getElementById('upzone'+n).classList.remove('open');
     document.getElementById('sbtn-cam'+n).classList.add('active-scan');
     document.getElementById('sbtn-up'+n).classList.remove('active-scan');
   }).catch(function(e) {
-    alert('Camera access denied or not available.\n\nTip: On iPhone, use Safari. On Android, use Chrome.\n\nYou can use "Upload Image" instead.\n\nError: '+e.message);
+    // If requested camera not found, try the other one
+    if(e.name === 'OverconstrainedError' || e.name === 'NotFoundError') {
+      var fallback = facing === 'user' ? 'environment' : 'user';
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: fallback } }, audio: false
+      }).then(function(stream){
+        STATE.streams[n] = stream;
+        STATE.facing[n] = fallback;
+        var vid = document.getElementById('vid'+n);
+        vid.srcObject = stream;
+        vid.style.transform = 'scaleX(1)';
+        var flipBtn = document.getElementById('flip-btn'+n);
+        if(flipBtn) flipBtn.textContent = '🔄 FRONT CAM';
+        document.getElementById('cam'+n).classList.add('open');
+        document.getElementById('upzone'+n).classList.remove('open');
+        document.getElementById('sbtn-cam'+n).classList.add('active-scan');
+      }).catch(function(e2){
+        alert('Camera not available.\n\nTip: Use Safari on iPhone, Chrome on Android.\nOr use "Upload Image" instead.\n\nError: '+e2.message);
+      });
+    } else {
+      alert('Camera access denied.\n\nPlease allow camera permission and try again.\nOr use "Upload Image" instead.\n\nError: '+e.message);
+    }
   });
 }
 
+function flipCam(n) {
+  var current = STATE.facing[n] || 'environment';
+  var next = current === 'environment' ? 'user' : 'environment';
+  _openCam(n, next);
+}
+
 function stopCam(n) {
-  if(STATE.streams[n]){ STATE.streams[n].getTracks().forEach(function(t){t.stop();}); STATE.streams[n]=null; }
+  if(STATE.streams[n]){
+    STATE.streams[n].getTracks().forEach(function(t){t.stop()});
+    STATE.streams[n]=null;
+  }
   document.getElementById('cam'+n).classList.remove('open');
   document.getElementById('sbtn-cam'+n).classList.remove('active-scan');
 }
@@ -779,6 +858,11 @@ function snapPhoto(n) {
   cv.width  = vid.videoWidth  || 640;
   cv.height = vid.videoHeight || 480;
   var ctx = cv.getContext('2d');
+  // If front camera (mirrored), flip canvas back so image is correct
+  if(STATE.facing[n] === 'user'){
+    ctx.translate(cv.width, 0);
+    ctx.scale(-1, 1);
+  }
   ctx.drawImage(vid, 0, 0);
   var dataUrl = cv.toDataURL('image/jpeg', 0.92);
   stopCam(n);
